@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "app.h": "c",
+        "cstdlib": "c",
+        "sharedmemory.h": "c",
+        "queue.h": "c",
+        "manager.h": "c",
+        "motors.h": "c",
+        "motors_action.h": "c",
+        "stdio.h": "c",
+        "servo_action.h": "c",
+        "unordered_map": "c"
+    }
+}

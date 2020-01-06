@@ -1,0 +1,51 @@
+rover_motor_control
+desc: Responsavel por controlar os motores (direção e potencia)
+
+recebe um sinal do manager para atualizar seu estado.
+le novo estado na sharedmemory SHM_MOTOR_ID e preenche a sua estrutura
+
+
+rover_servo_control 
+desc: Responsavel por controlar o servo (posição)
+
+recebe um sinal do manager para atualizar seu estado.
+le novo estado na sharedmemory SHM_SERVO_ID e preenche a sua estrutura 
+
+rover_ultrasom 
+desc: Responsavel por realizar a leitura da distancia 
+
+recebe um sinal do manager para realizar a leitura da distancia e atualiza 
+a sharedmemory 
+
+rover_server
+desc: Servidor responsavel por fazer a interface com as aplicações clients
+no formato tcp 
+
+fica aguardando alguma requisição do cliente, assim que recebida envia para 
+o manager atraves de sua queue QUEUE_MANAGER_ID para realizar a identificação
+e o parser para sua respectiva estrutura 
+
+rover_manager 
+desc: Responsavel pelo o direcionamento das mensagem providas pelo servidor
+
+fica aguardando mensagens do servidor, assim que recebida realiza o parse e o 
+preenchimento da estrutura do respectivo processo e após realizado envia um 
+sinal para seu respectivo processo para realizar a atualização
+
+rover_launch:
+desc: inicia os processos ROVER_PROCESS_SERVER, ROVER_PROCESS_MOTOR, 
+ROVER_PROCESS_SERVO, ROVER_PROCESS_MANAGER
+
+Inicia as Sharedmemories  SHM_MOTOR_ID,  SHM_SERVO_ID , SHM_PROCESSES 
+e queue QUEUE_MANAGER_ID 
+
+rover_unlaunch:
+desc: finaliza os processos ROVER_PROCESS_SERVER, ROVER_PROCESS_MOTOR, 
+ROVER_PROCESS_SERVO, ROVER_PROCESS_MANAGER
+
+Finaliza as Sharedmemories  SHM_MOTOR_ID,  SHM_SERVO_ID , SHM_PROCESSES 
+e queue QUEUE_MANAGER_ID 
+
+
+
+

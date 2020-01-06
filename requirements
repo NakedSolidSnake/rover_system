@@ -1,0 +1,16 @@
+Concluido
+--------------------------------------------------------------------------------
+
+
+A fazer
+--------------------------------------------------------------------------------
+*Criar aplicaçao client para PC em Qt 
+*Criar aplicação client para Android para controlar via Celular
+*Implementar resposta do servidor
+*Modificar armazenamento de pid dos processos lançados para guardar na shared
+memory
+*Implementar mecanismo para realização de update via kill
+*Atualizar as libs 
+*Criar lib para signal
+*Criar lib para server 
+*Criar lib para client

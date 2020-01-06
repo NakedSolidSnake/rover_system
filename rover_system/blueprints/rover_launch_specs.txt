@@ -1,0 +1,4 @@
+Inicia as filas 
+Inicia a sharedmemory
+Salva pid do processo na sharedmemory 
+

@@ -1,0 +1,53 @@
+Rover Linux Project 
+
+Description: This project is about creating embedded software 
+using Linux API.
+
+To understand how use share memory, queue, socket and semphores
+It was used a Rover a very common project used along an Arduino
+board
+
+this project uses a lot of concepts, in easy way to understand 
+
+
+to control motors send one of them following commands:
+
+move forward
+move left
+move right
+move stop
+move reverse
+
+to increase or decreases speed
+
+power [value] 
+
+value must be between 0 - 1000
+
+to control servo to specific position
+
+set center
+set left 
+set right 
+
+to control servo position in fine way 
+
+graus [degree]
+
+degree must be between 0 - 180
+
+Compiling the project
+
+$ mkdir build && cd build 
+
+for pc platform 
+$ cmake -DARCH=PC ..
+
+for raspberry platform
+$ cmake -DARCH=RASPBERRY ..
+
+$ make 
+
+$ make package 
+
+$ sudo make install
