@@ -27,8 +27,8 @@ void func(int sockfd)
 {
     int i = 0;
     protocol_t proto[2] = {
-            {"0000", "9999", "move forward", "FFFF"},
-            {"0001", "5555", "turn left", "AAAA"}
+            { 0, 12, "move forward", 0xFFFF},
+			{ 1, 9 , "turn left"   , 0xAAAA}
         };
     client_st cl;
     char server_b[MAX];
@@ -40,7 +40,7 @@ void func(int sockfd)
         bzero(server_b, sizeof(server_b));
 
         
-        protocol_set(server_b, MAX, &proto[i]);
+        protocol_mount(&proto[i], server_b, MAX);
         if(i)
             i = 0;
         else

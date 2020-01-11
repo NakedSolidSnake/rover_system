@@ -1,78 +1,77 @@
+#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <protocol.h>
 
-int protocol_setId(protocol_t *p, const char *id)
+enum protocol_identifier
 {
-  if(!p)
-    return -1;
+  PROT_ID = 0,
+  PROT_SIZE,
+  PROT_PAYLOAD,
+  PROT_CHECKSUM
+};
 
-  strncpy(p->id, id, ID_LEN);
+struct protocol_map
+{
+  int idx;
+  int (*cb_fill)(protocol_t *prot, const char *bFrag);
+};
+
+static int cb_fill_id(protocol_t *prot, const char *bFrag);
+static int cb_fill_size(protocol_t *prot, const char *bFrag);
+static int cb_fill_payload(protocol_t *prot, const char *bFrag);
+static int cb_fill_checkcsum(protocol_t *prot, const char *bFrag);
+
+int protocol_umount(protocol_t *p, const char *pBuff, int bSize)
+{
+  int i = 0;
+
+  struct protocol_map p_map[] =
+  {
+    {.idx = PROT_ID, cb_fill_id},
+    {.idx = PROT_SIZE, cb_fill_size},
+    {.idx = PROT_PAYLOAD, cb_fill_payload},
+    {.idx = PROT_CHECKSUM, cb_fill_checkcsum},    
+  };
+
+  char *pB = strtok((char *)pBuff, ":");
+  while(pB != NULL)
+  {
+    if ( p_map[i].cb_fill(p, pB) )
+      return i;
+    pB = strtok(NULL, ":");
+    i++;
+  }
+  
+   return 0;
+}
+
+int protocol_mount(const protocol_t *p, char *bOutput, int bSize)
+{
+  snprintf(bOutput, bSize, "%04d:%04d:%*s:%04d", p->id, p->size, p->size, p->payload, p->checksum);
+  return 0;  
+}
+
+static int cb_fill_id(protocol_t *prot, const char *bFrag)
+{
+  prot->id = atoi(bFrag);
   return 0;
 }
 
-int protocol_setSize(protocol_t *p, const char *size)
+static int cb_fill_size(protocol_t *prot, const char *bFrag)
 {
-  if(!p)
-    return -1;
-
-  strncpy(p->size, size, SIZE_LEN);
+  prot->size = atoi(bFrag);
   return 0;
 }
 
-int protocol_setPayload(protocol_t *p, const char *payload)
+static int cb_fill_payload(protocol_t *prot, const char *bFrag)
 {
-  if(!p)
-    return -1;
-  strncpy(p->payload, payload, PAYLOAD_LEN);
+  strncpy(prot->payload, bFrag, prot->size);
   return 0;
 }
 
-int protocol_setCheckSum(protocol_t *p, const char *checksum)
+static int cb_fill_checkcsum(protocol_t *prot, const char *bFrag)
 {
-  if(!p)
-    return -1;
-
-  strncpy(p->chk, checksum, CHKSUM_LEN);
-  return 0;
-}
-
-int protocol_get(protocol_t *p, const char *pBuff, int bSize)
-{
-  char *pOffset = pBuff;
-  if(!p)
-    return -1;
-
-  memset(p, 0, sizeof(protocol_t));
-
-  memcpy(p->id, pOffset, ID_LEN);
-  pOffset = pOffset + sizeof(p->id);
-  memcpy(p->size, pOffset, SIZE_LEN);
-  pOffset = pOffset + sizeof(p->size);
-  memcpy(p->payload, pOffset, PAYLOAD_LEN);
-  pOffset = pOffset + sizeof(p->payload);
-  memcpy(p->chk, pOffset, CHKSUM_LEN);
-
-  return 0;
-}
-
-int protocol_set(char *bOutput, int bSize, const protocol_t *p)
-{
-  char *pBuff = NULL;
-
-  if(!bOutput)
-    return -1;
-
-  if(bSize < sizeof(protocol_t))
-    return 1;
-
-  pBuff = bOutput;
-  memcpy(pBuff, p->id, ID_LEN);
-  pBuff = pBuff + sizeof(p->id);
-  memcpy(pBuff, p->size, SIZE_LEN);
-  pBuff = pBuff + sizeof(p->size);
-  memcpy(pBuff, p->payload, PAYLOAD_LEN);
-  pBuff = pBuff + sizeof(p->payload);
-  memcpy(pBuff, p->chk, CHKSUM_LEN);
-
+  prot->checksum = (unsigned short) strtoul (bFrag, NULL, 16);
   return 0;
 }

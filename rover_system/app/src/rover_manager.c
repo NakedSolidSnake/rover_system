@@ -60,16 +60,13 @@ int main()
     memset(&data, 0, sizeof(data));
     memset(&proto, 0, sizeof(proto));
 
-    protocol_get(&proto, queue.bData, sizeof(proto));
-    logArgs(LOG_INFO, ROVER_MANAGER, "Received: id: %s size: %s payload: %s checksum: %s", proto.id,
+    protocol_umount(&proto, queue.bData, sizeof(proto));
+    logArgs(LOG_INFO, ROVER_MANAGER, "Received: id: %04d size: %04d payload: %s checksum: %04d", proto.id,
                                                                                            proto.size,
                                                                                            proto.payload,
-                                                                                           proto.chk);
+                                                                                           proto.checksum);
 
-    data.id = atoi(proto.id);
-    memcpy(data.command, proto.payload, sizeof(proto.payload));
-
-    if(manager(data.id, data.command, mem) != 0){
+    if(manager(proto.id, proto.payload, mem) != 0){
       log(LOG_INFO, ROVER_MANAGER, "Error type no exist.");
     }
 
