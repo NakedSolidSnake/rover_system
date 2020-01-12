@@ -7,6 +7,10 @@
 #include <QSlider>
 #include <QKeyEvent>
 
+#define SERVO_LEFT_POS      29
+#define SERVO_CENTER_POS    73
+#define SERVO_RIGHT_POS     118
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget),
@@ -23,6 +27,8 @@ Widget::Widget(QWidget *parent)
     ui->leSend->setText("0001:0004:size:FFFF");
 
     ui->vsPower->setMaximum(1000);
+    ui->dialServo->setMinimum(29);
+    ui->dialServo->setMaximum(118);
 }
 
 Widget::~Widget()
@@ -54,6 +60,7 @@ void Widget::on_btConnect_clicked()
     connect(mSocket, &QTcpSocket::connected, this, &Widget::socketReady);
     connect(mSocket, &QTcpSocket::stateChanged,this,&Widget::stateChanged);
     connect(ui->vsPower, &QSlider::valueChanged, this, &Widget::on_powerChanged);
+    connect(ui->dialServo, &QDial::valueChanged, this, &Widget::on_servoSetPosition);
 
     out.setDevice(mSocket);
 
@@ -88,6 +95,7 @@ void Widget::buttonState(bool state)
     ui->gbSend->setEnabled(!state);
 
     ui->gbCommand->setEnabled(!state);
+    ui->gbServo->setEnabled(!state);
 
 }
 
@@ -152,3 +160,28 @@ void Widget::on_btLess_clicked()
     int value = ui->vsPower->value() - 1;
     ui->vsPower->setValue(value);
 }
+
+void Widget::on_btServoRight_clicked()
+{
+    QString command = "0001:0009:set right:FFFF";
+    ui->dialServo->setValue(SERVO_RIGHT_POS);
+}
+
+void Widget::on_btServoCenter_clicked()
+{
+    QString command = "0001:0010:set center:FFFF";
+    ui->dialServo->setValue(SERVO_CENTER_POS);
+}
+
+void Widget::on_btServoLeft_clicked()
+{
+    QString command = "0001:0008:set left:FFFF";
+    ui->dialServo->setValue(SERVO_LEFT_POS);
+}
+
+void Widget::on_servoSetPosition(int value)
+{
+    QString command = QString("0001:0012:graus %1:FFFF").arg(value);
+    out.writeRawData(command.toLocal8Bit(), command.size());
+}
+

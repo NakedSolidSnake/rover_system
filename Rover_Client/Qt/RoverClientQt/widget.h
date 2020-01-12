@@ -33,11 +33,12 @@ private slots:
     void on_btRight_clicked();
     void on_btBackwards_clicked();
     void on_powerChanged(int value);
-
-
     void on_btPlus_clicked();
-
     void on_btLess_clicked();
+    void on_btServoRight_clicked();
+    void on_btServoCenter_clicked();
+    void on_btServoLeft_clicked();
+    void on_servoSetPosition(int value);
 
 private:
     Ui::Widget *ui;
