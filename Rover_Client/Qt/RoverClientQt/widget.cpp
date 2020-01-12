@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QDataStream>
 #include "protocol.h"
+#include <QLCDNumber>
+#include <QSlider>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -18,7 +20,9 @@ Widget::Widget(QWidget *parent)
 
     ui->leIP->setText("localhost");
     ui->lePort->setText("8080");
-    ui->leSend->setText("0001:0003:size:FFFF");
+    ui->leSend->setText("0001:0004:size:FFFF");
+
+    ui->vsPower->setMaximum(1000);
 }
 
 Widget::~Widget()
@@ -49,6 +53,8 @@ void Widget::on_btConnect_clicked()
 
     connect(mSocket, &QTcpSocket::connected, this, &Widget::socketReady);
     connect(mSocket, &QTcpSocket::stateChanged,this,&Widget::stateChanged);
+    connect(ui->vsPower, &QSlider::valueChanged, this, &Widget::on_powerChanged);
+    out.setDevice(mSocket);
 
     buttonState(false);
 }
@@ -67,8 +73,6 @@ void Widget::on_btSend_clicked()
 
     qDebug() << buffer;
 
-    QDataStream out(mSocket);
-
     out.writeRawData(buffer.toLocal8Bit(), buffer.size());
 }
 
@@ -80,4 +84,44 @@ void Widget::buttonState(bool state)
 
     ui->btDisconnect->setEnabled(!state);
     ui->gbSend->setEnabled(!state);
+
+    ui->gbCommand->setEnabled(!state);
+
+}
+
+void Widget::on_btForward_clicked()
+{
+    QString command = "0000:0012:move forward:FFFF";
+    out.writeRawData(command.toLocal8Bit(), command.size());
+}
+
+void Widget::on_btStop_clicked()
+{
+    QString command = "0000:0009:move stop:FFFF";
+    out.writeRawData(command.toLocal8Bit(), command.size());
+}
+
+void Widget::on_btLeft_clicked()
+{
+    QString command = "0000:0009:move left:FFFF";
+    out.writeRawData(command.toLocal8Bit(), command.size());
+}
+
+void Widget::on_btRight_clicked()
+{
+    QString command = "0000:0010:move right:FFFF";
+    out.writeRawData(command.toLocal8Bit(), command.size());
+}
+
+void Widget::on_btBackwards_clicked()
+{
+    QString command = "0000:0012:move reverse:FFFF";
+    out.writeRawData(command.toLocal8Bit(), command.size());
+}
+
+void Widget::on_powerChanged(int value)
+{
+    QString command = QString("0000:0012:power %1:FFFF").arg(value);
+    ui->lcdPower->display(value);
+    out.writeRawData(command.toLocal8Bit(), command.size());
 }
