@@ -35,6 +35,10 @@ private slots:
     void on_powerChanged(int value);
 
 
+    void on_btPlus_clicked();
+
+    void on_btLess_clicked();
+
 private:
     Ui::Widget *ui;
     QTcpSocket *mSocket;

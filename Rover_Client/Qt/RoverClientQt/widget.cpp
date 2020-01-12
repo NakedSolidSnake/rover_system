@@ -5,13 +5,13 @@
 #include "protocol.h"
 #include <QLCDNumber>
 #include <QSlider>
+#include <QKeyEvent>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget),
       mSocket(new QTcpSocket(this)),
       mSocketReady(false)
-
 {
     ui->setupUi(this);
     setWindowTitle("Client | Data Sender");
@@ -54,6 +54,7 @@ void Widget::on_btConnect_clicked()
     connect(mSocket, &QTcpSocket::connected, this, &Widget::socketReady);
     connect(mSocket, &QTcpSocket::stateChanged,this,&Widget::stateChanged);
     connect(ui->vsPower, &QSlider::valueChanged, this, &Widget::on_powerChanged);
+
     out.setDevice(mSocket);
 
     buttonState(false);
@@ -98,8 +99,8 @@ void Widget::setKeySequence()
     ui->btRight->setShortcut(QKeySequence(Qt::Key_Right));
     ui->btStop->setShortcut(QKeySequence(Qt::Key_0));
 
-//    ui->btStop->setShortcut(QKeySequence(Qt::Key_Less));
-//    ui->btStop->setShortcut(QKeySequence(Qt::Key_Plus));
+    ui->btLess->setShortcut(QKeySequence(Qt::Key_Minus));
+    ui->btPlus->setShortcut(QKeySequence(Qt::Key_Plus));
 
 }
 
@@ -138,4 +139,16 @@ void Widget::on_powerChanged(int value)
     QString command = QString("0000:0012:power %1:FFFF").arg(value);
     ui->lcdPower->display(value);
     out.writeRawData(command.toLocal8Bit(), command.size());
+}
+
+void Widget::on_btPlus_clicked()
+{
+    int value = ui->vsPower->value() + 1;
+    ui->vsPower->setValue(value);
+}
+
+void Widget::on_btLess_clicked()
+{
+    int value = ui->vsPower->value() - 1;
+    ui->vsPower->setValue(value);
 }
