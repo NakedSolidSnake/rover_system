@@ -57,6 +57,7 @@ void Widget::on_btConnect_clicked()
     out.setDevice(mSocket);
 
     buttonState(false);
+    setKeySequence();
 }
 
 void Widget::on_btDisconnect_clicked()
@@ -86,6 +87,19 @@ void Widget::buttonState(bool state)
     ui->gbSend->setEnabled(!state);
 
     ui->gbCommand->setEnabled(!state);
+
+}
+
+void Widget::setKeySequence()
+{
+    ui->btForward->setShortcut(QKeySequence(Qt::Key_Up));
+    ui->btBackwards->setShortcut(QKeySequence(Qt::Key_Down));
+    ui->btLeft->setShortcut(QKeySequence(Qt::Key_Left));
+    ui->btRight->setShortcut(QKeySequence(Qt::Key_Right));
+    ui->btStop->setShortcut(QKeySequence(Qt::Key_0));
+
+//    ui->btStop->setShortcut(QKeySequence(Qt::Key_Less));
+//    ui->btStop->setShortcut(QKeySequence(Qt::Key_Plus));
 
 }
 

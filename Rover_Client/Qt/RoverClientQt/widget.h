@@ -19,6 +19,7 @@ public:
 
 private:
     void buttonState(bool state);
+    void setKeySequence(void);
 
 private slots:
     void socketReady();
@@ -31,8 +32,8 @@ private slots:
     void on_btLeft_clicked();
     void on_btRight_clicked();
     void on_btBackwards_clicked();
-
     void on_powerChanged(int value);
+
 
 private:
     Ui::Widget *ui;
