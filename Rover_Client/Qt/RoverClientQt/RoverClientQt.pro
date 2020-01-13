@@ -17,10 +17,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
+    persistconfig.cpp \
     protocol.cpp \
     widget.cpp
 
 HEADERS += \
+    persistconfig.h \
     protocol.h \
     widget.h
 

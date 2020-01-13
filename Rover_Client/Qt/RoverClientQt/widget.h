@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTcpSocket>
 #include <QDataStream>
+#include "persistconfig.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -20,6 +21,7 @@ public:
 private:
     void buttonState(bool state);
     void setKeySequence(void);
+    void loadSettings();
 
 private slots:
     void socketReady();
@@ -39,11 +41,14 @@ private slots:
     void on_btServoCenter_clicked();
     void on_btServoLeft_clicked();
     void on_servoSetPosition(int value);
+    void on_saveHostSettings(void);
+    void on_savePortSettings(void);
 
 private:
     Ui::Widget *ui;
     QTcpSocket *mSocket;
     bool mSocketReady;
     QDataStream out;
+    PersistConfig persistConfig;
 };
 #endif // WIDGET_H

@@ -18,12 +18,16 @@ Widget::Widget(QWidget *parent)
       mSocketReady(false)
 {
     ui->setupUi(this);
+
+    connect(ui->leIP, &QLineEdit::editingFinished, this, &Widget::on_saveHostSettings);
+    connect(ui->lePort, &QLineEdit::editingFinished, this, &Widget::on_savePortSettings);
+
     setWindowTitle("Client | Data Sender");
 
     buttonState(true);
 
-    ui->leIP->setText("localhost");
-    ui->lePort->setText("8080");
+    loadSettings();
+
     ui->leSend->setText("0001:0004:size:FFFF");
 
     ui->vsPower->setMaximum(1000);
@@ -112,6 +116,36 @@ void Widget::setKeySequence()
 
 }
 
+void Widget::loadSettings()
+{
+    QMap<QString, QString> keys;
+    keys["host"] = "";
+    keys["port"] = "";
+    persistConfig.getData("config", keys);
+
+    QMapIterator<QString, QString> it(keys);
+
+    while(it.hasNext()){
+        it.next();
+
+        if(it.key() == "host"){
+            if(!it.value().isEmpty()){
+                 ui->leIP->setText(it.value());
+            }else {
+                ui->leIP->setText("localhost");
+            }
+        }
+
+        if(it.key() == "port"){
+            if(!it.value().isEmpty()){
+                 ui->lePort->setText(it.value());
+            }else {
+                ui->lePort->setText("1234");
+            }
+        }
+    }
+}
+
 void Widget::on_btForward_clicked()
 {
     QString command = "0000:0012:move forward:FFFF";
@@ -185,3 +219,16 @@ void Widget::on_servoSetPosition(int value)
     out.writeRawData(command.toLocal8Bit(), command.size());
 }
 
+void Widget::on_saveHostSettings()
+{
+    QMap<QString, QString> key;
+    key["host"] = ui->leIP->text();
+    persistConfig.save("config", key);
+}
+
+void Widget::on_savePortSettings()
+{
+    QMap<QString, QString> key;
+    key["port"] = ui->lePort->text();
+    persistConfig.save("config", key);
+}
