@@ -16,3 +16,7 @@ A fazer
 *Criar lib para client
 *Transformar libs em shared lib
 *Documentar com o Doxygen
+*criar opcao no admin que lista os dados dos processos no diretorio /proc 
+*criar script para colocar no init.d
+*criar script para direcionar a instalação dos binarios
+*criar comando customizado para testar binarios com valgrind
