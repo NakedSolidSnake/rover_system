@@ -1,10 +1,54 @@
-Requisitos de Produto:
+Requisitos não funcionais:
++-----------------------------------------------------------------------------------+
 
+1. Requisitos de Produto:
 
-Requisitos Organizacionais:
+1.1. Requisitos de Usabilidade
+    1.1.1. O sistema deverá ser de fácil operação e intuitivo.
+    1.1.2. O sistema deverá oferecer uma interface amigável de fácil instalação.
 
+1.2. Requisitos de Eficiencia
+    1.2.1. O sistema deverá responder todas as requisições realizadas pela aplicação
+           de controle.
 
-Requisitos externos:
+1.3. Requisitos de Confiabilidade
+    1.3.1. O sistema deverá estar sempre disponivel.
+    1.3.2. O sistema deverá sempre apresentando o seu estado, afim de tomar devidas 
+           providencias.
+
+1.4. Requisitos de Portabilidade
+    1.4.1. O sistema deverá ser desenvolvido de forma que caso mude a plaforma, seja
+           rápida a migração para a nova plaforma.
+
+2. Requisitos Organizacionais:
+
+2.1. Requisitos de Entrega
+    2.1.1. Para cada marco deverá emitir um relatório das funcionalidades adicionadas.
+
+2.2. Requisitos de Implementação
+    2.2.1. O sistema que será embarcado deverá ser feito em linguagem C.
+    2.2.2. O sistema de controle(cliente) deverá ser feito em Java para plaformas
+           mobile.
+    2.2.3. O sistema de controle(cliente) deverá ser feito em Qt para plaformas
+           PC.
+
+2.3. Requisitos de padrões
+    2.3.1. O sistema deverá ser desenvolvido com paradigmas de programação POO e
+           estruturada.
+
+3. Requisitos externos:
+
+3.1. Requisitos de interoperabilidade
+    3.1.1. O sistema deverá se comunicar com o banco de dados SQL
+
+3.2. Requisitos éticos
+    3.2.1. Não deverá ser de cunho mal intencionado.
+
+3.3. Requisitos legais
+    3.3.1. O sistema deverá seguir a norma e leis que regulamenta o setor.
+
+Requisitos funcionais:
++-----------------------------------------------------------------------------------+
 
 
 

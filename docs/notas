@@ -2,15 +2,19 @@ Os requisitos funcionais podem ser cálculos, detalhes técnicos,
 manipulação de dados e de processamento e outras funcionalidades
 específicas que definem o que um sistema, idealmente, será capaz de realizar. 
 
+O plano para a implementação dos requisitos funcionais é detalhado no projeto
+do sistema. Já o plano para a implementação de requisitos não funcionais é
+detalhado na arquitetura do sistema.
+
 Requisitos não-funcionais (também conhecidos como requisitos de qualidade),
 que impõem restrições sobre o projeto ou execução (tais como requisitos de
 desempenho, segurança ou confiabilidade).
 
 https://pt.wikipedia.org/wiki/Requisito_n%C3%A3o_funcional
+https://codificar.com.br/requisitos-funcionais-nao-funcionais/
+https://pt.wikipedia.org/wiki/Requisito_funcional
+https://www.devmedia.com.br/artigo-engenharia-de-software-3-requisitos-nao-funcionais/9525
 
-O plano para a implementação dos requisitos funcionais é detalhado no projeto
-do sistema. Já o plano para a implementação de requisitos não funcionais é
-detalhado na arquitetura do sistema.
 
 Diagrama de sequência (ou Diagrama de Sequência de Mensagens) é um
 diagrama usado em UML (Unified Modeling Language), representando a
