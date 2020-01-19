@@ -7,7 +7,6 @@ target_sources(app
   )
 target_include_directories(app 
   PUBLIC 
-  ${CMAKE_CURRENT_LIST_DIR}/libs/include
   ${CMAKE_CURRENT_LIST_DIR}/include
   )
   
@@ -16,15 +15,13 @@ target_include_directories(app
 #------------------------------------------------------------------------------------------------------
 add_executable(rover_server "")
 target_link_libraries(rover_server PUBLIC  ipc app)
-#target_include_directories(lib PUBLIC ${CMAKE_CURRENT_LIST_DIR}/lib/include)
 target_sources(rover_server
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/src/rover_server.c
   )
 target_include_directories(rover_server 
   PUBLIC 
-  ${CMAKE_CURRENT_LIST_DIR}/include
-  ${CMAKE_CURRENT_LIST_DIR}/libs/include
+  ${CMAKE_CURRENT_LIST_DIR}/include  
   )
 install(TARGETS rover_server DESTINATION bin)
 
@@ -39,8 +36,7 @@ target_sources(rover_client
   )
 target_include_directories(rover_client
   PUBLIC 
-  ${CMAKE_CURRENT_LIST_DIR}/include
-  ${CMAKE_CURRENT_LIST_DIR}/libs/include
+  ${CMAKE_CURRENT_LIST_DIR}/include  
   )
 install(TARGETS rover_client DESTINATION bin)
 
@@ -49,14 +45,12 @@ install(TARGETS rover_client DESTINATION bin)
 #------------------------------------------------------------------------------------------------------
 add_executable(rover_manager "")
 target_link_libraries(rover_manager PUBLIC ipc app)
-#target_include_directories(lib PUBLIC ${CMAKE_CURRENT_LIST_DIR}/lib/include)
 target_sources(rover_manager
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/src/rover_manager.c
   )
 target_include_directories(rover_manager
   PUBLIC 
-  ${CMAKE_CURRENT_LIST_DIR}/libs/include
   ${CMAKE_CURRENT_LIST_DIR}/include
   )
 install(TARGETS rover_manager DESTINATION bin)
@@ -66,14 +60,12 @@ install(TARGETS rover_manager DESTINATION bin)
 #------------------------------------------------------------------------------------------------------
 add_executable(rover_motor_control "")
 target_link_libraries(rover_motor_control PUBLIC ipc drivers app)
-#target_include_directories(lib PUBLIC ${CMAKE_CURRENT_LIST_DIR}/lib/include)
 target_sources(rover_motor_control
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/src/rover_motor_control.c
   )
 target_include_directories(rover_motor_control
   PUBLIC 
-  ${CMAKE_CURRENT_LIST_DIR}/libs/include
   ${CMAKE_CURRENT_LIST_DIR}/include
   ${CMAKE_CURRENT_LIST_DIR}/driver/include
   )
@@ -82,14 +74,12 @@ install(TARGETS rover_motor_control DESTINATION bin)
 #rover_servo_control
 add_executable(rover_servo_control "")
 target_link_libraries(rover_servo_control PUBLIC ipc drivers app)
-#target_include_directories(lib PUBLIC ${CMAKE_CURRENT_LIST_DIR}/lib/include)
 target_sources(rover_servo_control
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/src/rover_servo_control.c
   )
 target_include_directories(rover_servo_control
   PUBLIC 
-  ${CMAKE_CURRENT_LIST_DIR}/libs/include
   ${CMAKE_CURRENT_LIST_DIR}/include
   ${CMAKE_CURRENT_LIST_DIR}/driver/include
   )
@@ -103,8 +93,7 @@ target_sources(rover_launch
   ${CMAKE_CURRENT_LIST_DIR}/src/rover_launch.c
   )
 target_include_directories(rover_launch
-  PUBLIC 
-  ${CMAKE_CURRENT_LIST_DIR}/libs/include
+  PUBLIC   
   ${CMAKE_CURRENT_LIST_DIR}/include
   )
 install(TARGETS rover_launch DESTINATION bin)
@@ -120,7 +109,6 @@ target_sources(rover_unlaunch
   )
 target_include_directories(rover_unlaunch
   PUBLIC 
-  ${CMAKE_CURRENT_LIST_DIR}/libs/include
   ${CMAKE_CURRENT_LIST_DIR}/include
   )
 install(TARGETS rover_unlaunch DESTINATION bin)
@@ -135,7 +123,6 @@ target_sources(rover_admin
   )
 target_include_directories(rover_admin
   PUBLIC 
-  ${CMAKE_CURRENT_LIST_DIR}/libs/include
   ${CMAKE_CURRENT_LIST_DIR}/include
   )
 install(TARGETS rover_admin DESTINATION bin)

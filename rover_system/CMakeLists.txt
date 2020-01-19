@@ -31,7 +31,7 @@ enable_testing()
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/driver)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/app)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/libs)
+# add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/libs)
 
 #------------------------------------------------------------------------------------------------------
 #Tests
