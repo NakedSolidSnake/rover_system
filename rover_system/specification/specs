@@ -1,9 +1,0 @@
-*criar client em qt
-*criar client em java
-*criar client app para android  
-
-*modificar forma de inicilização dos processos usando tabela de sharedmemory para guardar os ids e nome dos processos 
-*Criar comandos de inspeção para verificar estado das tabelas
-*Criar Lib para servidor 
-*Criar uma abstração para sharedmemory
-
