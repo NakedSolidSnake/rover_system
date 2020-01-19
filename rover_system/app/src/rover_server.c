@@ -11,6 +11,7 @@
 #include <protocol.h>
 #include <signal/signal.h>
 #include <signal.h>
+#include <unistd.h>
 
 #define MAX 4096
 #define PORT 8080
@@ -138,7 +139,7 @@ int main()
     len = sizeof(cli);
 
     // Accept the data packet from client and verification
-    connfd = accept(sockfd, (SA *)&cli, &len);
+    connfd = accept(sockfd, (SA *)&cli, (socklen_t *)&len);
     if (connfd < 0)
     {
       log(LOG_INFO, ROVER_SERVER, "Server accept failed.");

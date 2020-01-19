@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <hc_sr04.h>
+#include <unistd.h>
 
 int main()
 {

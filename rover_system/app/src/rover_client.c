@@ -3,9 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <signal.h>
 #include <protocol.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define MAX 4096
 #define PORT 8080
@@ -31,8 +34,7 @@ void func(int sockfd)
         };
     client_st cl;
     char server_b[MAX];
-
-    int n;
+    
     for (;;)
     {
         bzero(cl.buff, sizeof(cl.buff));
@@ -59,10 +61,8 @@ void func(int sockfd)
 
 int main()
 {
-    int sockfd, connfd;
-    struct sockaddr_in servaddr, cli;
-
-    char server_ip[100];
+    int sockfd;
+    struct sockaddr_in servaddr;
 
     signal(SIGINT, signal_handler);
 
@@ -77,8 +77,7 @@ int main()
     bzero(&servaddr, sizeof(servaddr));
 
     // assign IP, PORT
-    servaddr.sin_family = AF_INET;
-    //servaddr.sin_addr.s_addr = inet_addr(server_ip);
+    servaddr.sin_family = AF_INET;    
     servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
     servaddr.sin_port = htons(PORT);
 

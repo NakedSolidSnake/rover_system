@@ -23,15 +23,15 @@ typedef enum opt_e
 struct table  
 {
   int opt;
-  int (*pfunc)(void **args, MEM *mem);
+  int (*pfunc)(char **args, MEM *mem);
 };
 
-static int help(void **args, MEM *mem);
-static int process(void **args, MEM *mem);
-static int shm(void **args, MEM *mem);
-static int motor(void **args, MEM *mem);
-static int servo(void **args, MEM *mem);
-static int queue(void **args, MEM *mem);
+static int help(char **args, MEM *mem);
+static int process(char **args, MEM *mem);
+static int shm(char **args, MEM *mem);
+static int motor(char **args, MEM *mem);
+static int servo(char **args, MEM *mem);
+static int queue(char **args, MEM *mem);
 
 
 static char *isRunning(int pid)
@@ -51,7 +51,7 @@ static char *isRunning(int pid)
   return str;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
   int ret;
   MEM *mem = NULL;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
   return ret;
 }
 
-static int help(void **args, MEM *mem)
+static int help(char **args, MEM *mem)
 {
   const char *program = args[0];
   (void)mem;
@@ -132,7 +132,7 @@ static int help(void **args, MEM *mem)
   return 0;
 }
 
-static int process(void **args, MEM *mem)
+static int process(char **args, MEM *mem)
 {
   (void)args;
 
@@ -145,7 +145,7 @@ static int process(void **args, MEM *mem)
   return 0;
 }
 
-static int shm(void **args, MEM *mem)
+static int shm(char **args, MEM *mem)
 {
   (void)args;
 
@@ -167,7 +167,7 @@ static int shm(void **args, MEM *mem)
   return 0;
 }
 
-static int motor(void **args, MEM *mem)
+static int motor(char **args, MEM *mem)
 {
   (void)args;
 
@@ -181,7 +181,7 @@ static int motor(void **args, MEM *mem)
   return 0;
 }
 
-static int servo(void **args, MEM *mem)
+static int servo(char **args, MEM *mem)
 {
   (void)args;
 
@@ -195,7 +195,7 @@ static int servo(void **args, MEM *mem)
   return 0;
 }
 
-static int queue(void **args, MEM *mem)
+static int queue(char **args, MEM *mem)
 {
   (void)args;
 

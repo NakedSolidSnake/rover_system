@@ -11,8 +11,7 @@
 #define ROVER_UNLAUNCH "ROVER_UNLAUNCH"
 
 int main()
-{
-  int ret = -1;
+{  
   MEM *mem = NULL;
 
   mem = mem_get();

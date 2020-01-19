@@ -9,13 +9,6 @@ typedef struct motors_t{
   int _clock;
 }motors_t;
 
-static motors_t m = {
-  .power = 0,
-  .range = 1000,
-  ._clock = 384 
-};
-
-
 static void forwardSense(void);
 static void reverseSense(void);
 static void turnLetf(void);

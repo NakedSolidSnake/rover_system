@@ -25,13 +25,11 @@ static void signal_handler(int sig){
 static void emitSignal(const char *proc_name, MEM *mem);
 
 int main()
-{
-  int ret = -1;
+{  
   MEM *mem = NULL;
   protocol_t proto;
   queue_st queue;
-  generic_st data;
-
+  
   signal_register(signal_handler, SIGTERM);
 
   queue_id = queue_init(QUEUE_MANAGER_ID);
@@ -56,8 +54,7 @@ int main()
       log(LOG_INFO, ROVER_MANAGER, "Queue receive error.");
     } 
 
-    //convert to generic type to analise which id is.
-    memset(&data, 0, sizeof(data));
+    //convert to generic type to analise which id is.    
     memset(&proto, 0, sizeof(proto));
 
     protocol_umount(&proto, queue.bData, sizeof(proto));
@@ -75,10 +72,7 @@ int main()
 }
 
 int manager(int id, const char *command, MEM *mem)
-{
-  int offset = 0;
-  int status = 0;
-  generic_st data;
+{   
   char proc[PROC_NAME_MAX] = {0};
   generic_st *dev = NULL;
 

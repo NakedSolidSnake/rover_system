@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
@@ -9,7 +10,7 @@
 #include <signal/signal.h>
 #include <app.h>
 
-#define BSIZE       128
+#define BBSIZE       128
 
 #define ROVER_LAUNCH "ROVER_LAUNCH"
 
@@ -47,10 +48,10 @@ int main()
     proc->pid = fork();
     if (proc->pid == 0)
     {
-      char buffer[BSIZE] = {0};
+      char buffer[BBSIZE] = {0};
       snprintf(buffer, sizeof(buffer), "%s pid[%d]", proc->name, getpid());
       log(LOG_INFO, ROVER_LAUNCH, buffer);
-      execv(proc->name, NULL);
+      execv(proc->name, (char *)NULL);
     }
     else if (proc->pid == -1)
     {
@@ -70,6 +71,7 @@ static void init_fail(MEM *mem, int amount)
   if (!mem)
   {
     log(LOG_INFO, ROVER_LAUNCH, "Shared Memory not initialized");
+    return;
   }
 
   for (int i = 0; i < amount; i++)
