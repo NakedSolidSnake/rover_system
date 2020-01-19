@@ -1,5 +1,4 @@
-
-// Write CPP code here
+// Write C code here
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>

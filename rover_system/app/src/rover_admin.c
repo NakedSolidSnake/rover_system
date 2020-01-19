@@ -82,8 +82,6 @@ int main(int argc, char *argv[])
 
   const int table_size = sizeof(tab)/sizeof(tab[0]);
 
-  // memset(&mem, 0, sizeof(mem));
-
   while((opt = getopt_long(argc, argv, soptions, options, &opt_index)) != -1)
   {
     switch(opt)
@@ -98,7 +96,6 @@ int main(int argc, char *argv[])
     }
   }
 
-  // ret = mem_init(&mem);
   mem = mem_get();
   if(mem == NULL)
   {
