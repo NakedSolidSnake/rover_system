@@ -2,15 +2,18 @@ Concluido
 --------------------------------------------------------------------------------
 *Criar aplicaçao client para PC em Qt -- ok
 *Modificar armazenamento de pid dos processos lançados para guardar na sharedmemory
+*Criar comandos de inspeção para verificar estado das tabelas
 *Implementar mecanismo para realização de update via kill
 *Atualizar as libs 
 *Criar lib para signal -- ok
 *Compilar Client Qt com CMake
-
+*Criar uma abstração para sharedmemory
+*transformar libs em shared libs (*.so)
 
 A fazer
 --------------------------------------------------------------------------------
 *Criar aplicação client para Android para controlar via Celular
+*criar client em java usando Swing
 *Implementar resposta do servidor
 *Criar lib para server 
 *Criar lib para client
@@ -20,3 +23,8 @@ A fazer
 *criar script para colocar no init.d
 *criar script para direcionar a instalação dos binarios
 *criar comando customizado para testar binarios com valgrind
+*criar diagrama conceitual
+*criar diagrama de sequencia
+*criar diagrama de classes
+*criar diagrama de pacotes
+
