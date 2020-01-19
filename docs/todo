@@ -9,6 +9,7 @@ Concluido
 *Compilar Client Qt com CMake
 *Criar uma abstração para sharedmemory
 *transformar libs em shared libs (*.so)
+verificar para mudar para pause() enquanto não recebe sinal para atualizar o estado
 
 A fazer
 --------------------------------------------------------------------------------
