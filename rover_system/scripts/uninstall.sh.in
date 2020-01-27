@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [[ $1 < 2 ]]; then
+    rm -f /home/rover/rover 
+    rm -f /etc/rsyslog.d/rover_syslog.conf
+fi

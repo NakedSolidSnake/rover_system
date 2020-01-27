@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Creating links"
+ln -sf /home/rover/bin/rover_launch /usr/bin
+ln -sf @CPACK_PACKAGING_INSTAL_PREFIX@/dat/rover_syslog.conf /etc/rsyslod.d/

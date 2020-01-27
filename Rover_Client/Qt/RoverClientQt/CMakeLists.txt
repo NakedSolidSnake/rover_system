@@ -12,6 +12,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+ set (CMAKE_PREFIX_PATH $ENV{HOME}/Qt/5.12.1/gcc_64)
+
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
