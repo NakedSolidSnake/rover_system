@@ -1,91 +1,36 @@
-#include <netdb.h>
-#include <netinet/in.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <queue/queue.h>
 #include <log/log.h>
+#include <server/server_tcp.h>
 #include <app.h>
 #include <protocol.h>
 #include <signal/signal.h>
 #include <signal.h>
 #include <unistd.h>
 
-#define MAX 4096
-#define PORT 8080
-#define SA struct sockaddr
-
 #define ROVER_SERVER "ROVER_SERVER"
 
-#define RUNNING 1
-#define STOPPED 0
+static int sender(char *buffer, int *size);
+static int receive(char *buffer, int size);
 
-static int server_running = RUNNING;
-
-typedef enum COMM_ERROR
-{
-  ERROR_RECV = -1,
-  ERROR_CLIENT_DISCONNECTED = 0
-} COMM_ERROR;
-
-static int queue_id = -1;
-
-
-void server_state_change(int s);
 void end_server(int s);
 
-// Function designed for chat between client and server.
-void func(int sockfd)
-{
-  queue_st queue;
-  char buff[MAX];
-  int ret;
-  // infinite loop for chat
-
-  while (server_running)
-  {
-    bzero(buff, MAX);
-
-    // read the message from client and copy it in buffer
-    ret = recv(sockfd, buff, sizeof(buff), 0);
-
-    switch (ret)
-    {
-
-    case ERROR_RECV:
-      logger(LOGGER_INFO, ROVER_SERVER, "Error in recv");
-      close(sockfd);
-      return;
-
-    case ERROR_CLIENT_DISCONNECTED:
-      logger(LOGGER_INFO, ROVER_SERVER, "Client disconnected");
-      close(sockfd);
-      return;
-
-    default:
-      logger(LOGGER_INFO, ROVER_SERVER, buff);
-    }
-
-    memcpy(queue.bData, buff, sizeof(protocol_t));
-    queue.queueType = 1;
-    ret = queue_send(queue_id, &queue, sizeof(protocol_t));
-    if (ret < 0)
-    {
-      logger(LOGGER_INFO, ROVER_SERVER, "Error Queue Send.");
-    }
-  }
-  close(sockfd);
-}
+static int queue_id = -1;
+static queue_st queue;
 
 // Driver function
 int main()
 {
-  int sockfd, connfd, len;
-  struct sockaddr_in servaddr, cli;
+  Server_t server = 
+  {
+    .socket = -1,
+    .port = "8080",
+    .cb.recv = receive,
+    .cb.send = sender
+  };
 
-  signal_register(server_state_change, SIGINT);
   signal_register(end_server, SIGTERM);
 
   queue_id = queue_init(QUEUE_MANAGER_ID);
@@ -94,76 +39,35 @@ int main()
     logger(LOGGER_INFO, ROVER_SERVER, "Queue init failed");
     exit(1);
   }
-  // socket create and verification
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd == -1)
-  {
-    logger(LOGGER_INFO, ROVER_SERVER, "Socket creation failed.");
-    exit(1);
-  }
-  else
-  {
-    logger(LOGGER_INFO, ROVER_SERVER, "Socket successfully created");
-  }
-  
-  bzero(&servaddr, sizeof(servaddr));
 
-  // assign IP, PORT
-  servaddr.sin_family = AF_INET;
-  servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  servaddr.sin_port = htons(PORT);
-
-  // Binding newly created socket to given IP and verification
-  if ((bind(sockfd, (SA *)&servaddr, sizeof(servaddr))) != 0)
-  {
-    logger(LOGGER_INFO, ROVER_SERVER, "Bind failed.");
-    exit(1);
-  }
-  else
-  {
-    logger(LOGGER_INFO, ROVER_SERVER, "Server successfully binded.");
-  }
-
-  while (server_running)
-  {
-    // Now server is ready to listen and verification
-    if ((listen(sockfd, 1)) != 0)
-    {
-      logger(LOGGER_INFO, ROVER_SERVER, "Listen failed.");
-      exit(1);
-    }
-    else
-    {
-      logger(LOGGER_INFO, ROVER_SERVER, "Server listening.");
-    }
-    len = sizeof(cli);
-
-    // Accept the data packet from client and verification
-    connfd = accept(sockfd, (SA *)&cli, (socklen_t *)&len);
-    if (connfd < 0)
-    {
-      logger(LOGGER_INFO, ROVER_SERVER, "Server accept failed.");
-      exit(1);
-    }
-    else
-    {
-      logger(LOGGER_INFO, ROVER_SERVER, "Server accept client.");
-    }
-
-    // Function for chatting between client and server
-    func(connfd);
-  }
-  // After chatting close the socket
-  close(sockfd);
-}
-
-void server_state_change(int s)
-{
-  server_running = 0;
+  Server_init(&server);
+  Server_exec(&server);  
 }
 
 void end_server(int s)
 {
   logger(LOGGER_INFO, ROVER_SERVER, "Server unlaunched.");
   exit(s);
+}
+
+static int sender(char *buffer, int *size)
+{    
+    char message[] = "OK";
+    *size = strlen(message);
+    strncpy(buffer, message, *size);
+    return 0;
+}
+
+static int receive(char *buffer, int size)
+{
+    int ret = -1;    
+    memcpy(queue.bData, buffer, sizeof(protocol_t));
+    queue.queueType = 1;
+    ret = queue_send(queue_id, &queue, sizeof(protocol_t));
+    if (ret < 0)    
+      logger(LOGGER_INFO, ROVER_SERVER, "Error Queue Send.");
+
+    memset(buffer, 0, MAX_BUFFER_SEND_RECV);
+    
+    return 0;
 }

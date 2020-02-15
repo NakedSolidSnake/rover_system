@@ -14,7 +14,7 @@ target_include_directories(app
 #rover_server 
 #------------------------------------------------------------------------------------------------------
 add_executable(rover_server "")
-target_link_libraries(rover_server PUBLIC  ipc app)
+target_link_libraries(rover_server PUBLIC  ipc app comm)
 target_sources(rover_server
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/src/rover_server.c
