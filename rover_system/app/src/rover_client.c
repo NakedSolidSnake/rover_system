@@ -56,6 +56,9 @@ void func(int sockfd)
             printf("Client Exit...\n");
             break;
         }
+         bzero(cl.buff, sizeof(cl.buff));
+        recv(sockfd, cl.buff, sizeof(cl.buff), 0);
+        printf("%s\n", cl.buff);
     }
 }
 
