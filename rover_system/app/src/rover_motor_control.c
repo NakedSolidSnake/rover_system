@@ -32,7 +32,7 @@ int main()
   mem = mem_get();
   if(!mem)
   {
-    log(LOG_INFO, ROVER_MOTOR, "Memory not initialized");
+    logger(LOGGER_INFO, ROVER_MOTOR, "Memory not initialized");
     return 1;
   }
   
@@ -40,7 +40,7 @@ int main()
   {
     if(_update == 1){
       memcpy(&motores, &mem->motor, sizeof(motores));
-      log(LOG_INFO, ROVER_MOTOR, motores.command);
+      logger(LOGGER_INFO, ROVER_MOTOR, motores.command);
       //call command here
       motors_action_select(motores.command, strlen(motores.command));
       _update = 0;
@@ -58,6 +58,6 @@ void update(int s)
 
 void end_motor(int s)
 {
-  log(LOG_INFO, ROVER_MOTOR, "Motor unlaunched");
+  logger(LOGGER_INFO, ROVER_MOTOR, "Motor unlaunched");
   exit(s);
 }

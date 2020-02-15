@@ -55,17 +55,17 @@ void func(int sockfd)
     {
 
     case ERROR_RECV:
-      log(LOG_INFO, ROVER_SERVER, "Error in recv");
+      logger(LOGGER_INFO, ROVER_SERVER, "Error in recv");
       close(sockfd);
       return;
 
     case ERROR_CLIENT_DISCONNECTED:
-      log(LOG_INFO, ROVER_SERVER, "Client disconnected");
+      logger(LOGGER_INFO, ROVER_SERVER, "Client disconnected");
       close(sockfd);
       return;
 
     default:
-      log(LOG_INFO, ROVER_SERVER, buff);
+      logger(LOGGER_INFO, ROVER_SERVER, buff);
     }
 
     memcpy(queue.bData, buff, sizeof(protocol_t));
@@ -73,7 +73,7 @@ void func(int sockfd)
     ret = queue_send(queue_id, &queue, sizeof(protocol_t));
     if (ret < 0)
     {
-      log(LOG_INFO, ROVER_SERVER, "Error Queue Send.");
+      logger(LOGGER_INFO, ROVER_SERVER, "Error Queue Send.");
     }
   }
   close(sockfd);
@@ -91,19 +91,19 @@ int main()
   queue_id = queue_init(QUEUE_MANAGER_ID);
   if (queue_id < 0)
   {
-    log(LOG_INFO, ROVER_SERVER, "Queue init failed");
+    logger(LOGGER_INFO, ROVER_SERVER, "Queue init failed");
     exit(1);
   }
   // socket create and verification
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd == -1)
   {
-    log(LOG_INFO, ROVER_SERVER, "Socket creation failed.");
+    logger(LOGGER_INFO, ROVER_SERVER, "Socket creation failed.");
     exit(1);
   }
   else
   {
-    log(LOG_INFO, ROVER_SERVER, "Socket successfully created");
+    logger(LOGGER_INFO, ROVER_SERVER, "Socket successfully created");
   }
   
   bzero(&servaddr, sizeof(servaddr));
@@ -116,12 +116,12 @@ int main()
   // Binding newly created socket to given IP and verification
   if ((bind(sockfd, (SA *)&servaddr, sizeof(servaddr))) != 0)
   {
-    log(LOG_INFO, ROVER_SERVER, "Bind failed.");
+    logger(LOGGER_INFO, ROVER_SERVER, "Bind failed.");
     exit(1);
   }
   else
   {
-    log(LOG_INFO, ROVER_SERVER, "Server successfully binded.");
+    logger(LOGGER_INFO, ROVER_SERVER, "Server successfully binded.");
   }
 
   while (server_running)
@@ -129,12 +129,12 @@ int main()
     // Now server is ready to listen and verification
     if ((listen(sockfd, 1)) != 0)
     {
-      log(LOG_INFO, ROVER_SERVER, "Listen failed.");
+      logger(LOGGER_INFO, ROVER_SERVER, "Listen failed.");
       exit(1);
     }
     else
     {
-      log(LOG_INFO, ROVER_SERVER, "Server listening.");
+      logger(LOGGER_INFO, ROVER_SERVER, "Server listening.");
     }
     len = sizeof(cli);
 
@@ -142,12 +142,12 @@ int main()
     connfd = accept(sockfd, (SA *)&cli, (socklen_t *)&len);
     if (connfd < 0)
     {
-      log(LOG_INFO, ROVER_SERVER, "Server accept failed.");
+      logger(LOGGER_INFO, ROVER_SERVER, "Server accept failed.");
       exit(1);
     }
     else
     {
-      log(LOG_INFO, ROVER_SERVER, "Server accept client.");
+      logger(LOGGER_INFO, ROVER_SERVER, "Server accept client.");
     }
 
     // Function for chatting between client and server
@@ -164,6 +164,6 @@ void server_state_change(int s)
 
 void end_server(int s)
 {
-  log(LOG_INFO, ROVER_SERVER, "Server unlaunched.");
+  logger(LOGGER_INFO, ROVER_SERVER, "Server unlaunched.");
   exit(s);
 }

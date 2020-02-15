@@ -17,7 +17,7 @@ int main()
   mem = mem_get();
   if(mem == NULL)
   {
-    log(LOG_INFO, ROVER_UNLAUNCH, "Memory not initialized");
+    logger(LOGGER_INFO, ROVER_UNLAUNCH, "Memory not initialized");
     return 1;
   }
 

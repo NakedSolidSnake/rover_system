@@ -31,7 +31,7 @@ int main()
   mem = mem_get();
   if(!mem)
   {
-    log(LOG_INFO, ROVER_SERVO, "Memory not initialized");
+    logger(LOGGER_INFO, ROVER_SERVO, "Memory not initialized");
     return 1;
   }
 
@@ -40,7 +40,7 @@ int main()
     if(_update == 1)
     {
       memcpy(&servo, &mem->servo, sizeof(servo));
-      log(LOG_INFO, ROVER_SERVO, servo.command);
+      logger(LOGGER_INFO, ROVER_SERVO, servo.command);
       //call command here
       servo_action_select(servo.command, strlen(servo.command));
       _update = 0;
@@ -59,6 +59,6 @@ void update(int s)
 
 void end_servo(int s)
 {
-  log(LOG_INFO, ROVER_SERVO, "Servo Unlaunched");
+  logger(LOGGER_INFO, ROVER_SERVO, "Servo Unlaunched");
   exit(s);
 }

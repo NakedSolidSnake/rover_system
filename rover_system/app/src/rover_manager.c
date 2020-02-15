@@ -17,7 +17,7 @@ static int queue_id = -1;
 
 static void signal_handler(int sig){
   if(sig == SIGTERM){
-    log(LOG_INFO, ROVER_MANAGER, "Manager unlaunched");
+    logger(LOGGER_INFO, ROVER_MANAGER, "Manager unlaunched");
     exit(SIGTERM);
   }
 }
@@ -35,14 +35,14 @@ int main()
   queue_id = queue_init(QUEUE_MANAGER_ID);
 
   if(queue_id < 0){
-    log(LOG_INFO, ROVER_MANAGER, "Queue init error.");
+    logger(LOGGER_INFO, ROVER_MANAGER, "Queue init error.");
     exit(EXIT_FAILURE);
   }
 
   mem = mem_get();
   if(mem == NULL)
   {
-    log(LOG_INFO, ROVER_MANAGER, "Memory not initialized");
+    logger(LOGGER_INFO, ROVER_MANAGER, "Memory not initialized");
     return 1;
   }
   
@@ -51,20 +51,20 @@ int main()
   while(1)
   {
     if(queue_recv(queue_id, &queue, sizeof(queue.bData)) < 0){
-      log(LOG_INFO, ROVER_MANAGER, "Queue receive error.");
+      logger(LOGGER_INFO, ROVER_MANAGER, "Queue receive error.");
     } 
 
     //convert to generic type to analise which id is.    
     memset(&proto, 0, sizeof(proto));
 
     protocol_umount(&proto, queue.bData, sizeof(proto));
-    logArgs(LOG_INFO, ROVER_MANAGER, "Received: id: %04d size: %04d payload: %s checksum: %04d", proto.id,
+    loggerArgs(LOGGER_INFO, ROVER_MANAGER, "Received: id: %04d size: %04d payload: %s checksum: %04d", proto.id,
                                                                                            proto.size,
                                                                                            proto.payload,
                                                                                            proto.checksum);
 
     if(manager(proto.id, proto.payload, mem) != 0){
-      log(LOG_INFO, ROVER_MANAGER, "Error type no exist.");
+      logger(LOGGER_INFO, ROVER_MANAGER, "Error type no exist.");
     }
 
     memset(queue.bData, 0, sizeof(queue.bData));

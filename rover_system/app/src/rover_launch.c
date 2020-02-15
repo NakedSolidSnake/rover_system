@@ -26,20 +26,20 @@ int main()
   mem.queueid = queue_init(QUEUE_MANAGER_ID);
   if (mem.queueid < 0)
   {
-    log(LOG_INFO, ROVER_LAUNCH, "Queue init failed");
+    logger(LOGGER_INFO, ROVER_LAUNCH, "Queue init failed");
     exit(1);
   }
 
-  log(LOG_INFO, ROVER_LAUNCH, "Queue Initialized");
+  logger(LOGGER_INFO, ROVER_LAUNCH, "Queue Initialized");
 
   ret = mem_init(&mem);
   if (ret)
   {
-    log(LOG_INFO, ROVER_LAUNCH, "Error to create process table");
+    logger(LOGGER_INFO, ROVER_LAUNCH, "Error to create process table");
     return -1;
   }
 
-  log(LOG_INFO, ROVER_LAUNCH, "Memory Initialized");
+  logger(LOGGER_INFO, ROVER_LAUNCH, "Memory Initialized");
  
 
   for (int i = 0; i < (PROCESS_AMOUNT); i++)
@@ -50,7 +50,7 @@ int main()
     {
       char buffer[BBSIZE] = {0};
       snprintf(buffer, sizeof(buffer), "%s pid[%d]", proc->name, getpid());
-      log(LOG_INFO, ROVER_LAUNCH, buffer);
+      logger(LOGGER_INFO, ROVER_LAUNCH, buffer);
       execv(proc->name, (char *)NULL);
     }
     else if (proc->pid == -1)
@@ -70,7 +70,7 @@ static void init_fail(MEM *mem, int amount)
 {
   if (!mem)
   {
-    log(LOG_INFO, ROVER_LAUNCH, "Shared Memory not initialized");
+    logger(LOGGER_INFO, ROVER_LAUNCH, "Shared Memory not initialized");
     return;
   }
 
