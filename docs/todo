@@ -1,18 +1,18 @@
 Concluido
---------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 *Criar aplicaçao client para PC em Qt -- ok
 *Modificar armazenamento de pid dos processos lançados para guardar na sharedmemory
 *Criar comandos de inspeção para verificar estado das tabelas
 *Implementar mecanismo para realização de update via kill
 *Atualizar as libs 
-*Criar lib para signal -- ok
+*Criar lib para signal
 *Compilar Client Qt com CMake
 *Criar uma abstração para sharedmemory
 *transformar libs em shared libs (*.so)
 verificar para mudar para pause() enquanto não recebe sinal para atualizar o estado
 
 A fazer
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 *Criar aplicação client para Android para controlar via Celular
 *criar client em java usando Swing
 *Implementar resposta do servidor
@@ -30,4 +30,7 @@ A fazer
 *criar diagrama de pacotes
 *criar regras para log
 *criar log rotativo
-
+*criar um servidor MQTT para poder externar os dados de posicionamento leitura e potencia
+*Alterar a aplicação em QT para rodar em QML - visando o cross compile para mobile
+*Na Aplicação QML apresentar graficos para potencia e se possivel para distancia
+*Adicionar um webserver para exibir uma pagina
