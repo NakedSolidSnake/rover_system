@@ -8,7 +8,9 @@ process_t procs[] =
         {.pid = -1, .name = ROVER_PROCESS_MOTOR},
         {.pid = -1, .name = ROVER_PROCESS_SERVO},
         {.pid = -1, .name = ROVER_PROCESS_MANAGER},
-        {.pid = -1, .name = ROVER_PROCESS_SERVER}};
+        {.pid = -1, .name = ROVER_PROCESS_SERVER},
+        {.pid = -1, .name = ROVER_PROCESS_MQTT}
+    };
 
 int mem_init(MEM *mem)
 {
@@ -24,10 +26,10 @@ int mem_init(MEM *mem)
   if (!mem->init)
   {
     mem->shm = shm;
-    mem->procs[0] = procs[0];
-    mem->procs[1] = procs[1];
-    mem->procs[2] = procs[2];
-    mem->procs[3] = procs[3];
+    
+    for(int i = 0; i < PROCESS_AMOUNT; i++){
+      mem->procs[i] = procs[i];
+    }
 
     mem->init = 1;
 

@@ -126,3 +126,17 @@ target_include_directories(rover_admin
   ${CMAKE_CURRENT_LIST_DIR}/include
   )
 install(TARGETS rover_admin DESTINATION bin)
+
+
+#rover_mqtt
+add_executable(rover_mqtt "")
+target_link_libraries(rover_mqtt PUBLIC paho-mqtt3c app)
+target_sources(rover_mqtt
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/src/rover_mqtt.c
+  )
+target_include_directories(rover_mqtt
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/include
+  )
+install(TARGETS rover_mqtt DESTINATION bin)
