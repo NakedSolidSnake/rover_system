@@ -35,6 +35,8 @@ int main()
     return 1;
   }
 
+  logger(LOGGER_INFO, ROVER_SERVO, "Servo initialized");
+
   while(1)
   {
     if(_update == 1)

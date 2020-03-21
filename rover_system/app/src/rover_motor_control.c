@@ -35,6 +35,8 @@ int main()
     logger(LOGGER_INFO, ROVER_MOTOR, "Memory not initialized");
     return 1;
   }
+
+  logger(LOGGER_INFO, ROVER_MOTOR, "Motor initialized");
   
   while(1)
   {
