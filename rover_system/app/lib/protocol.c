@@ -35,11 +35,20 @@ int protocol_umount(protocol_t *p, const char *pBuff, int bSize)
   };
 
   char *pB = strtok((char *)pBuff, ":");
+  if(strncmp(pB, "$", 1))
+    return 1;
+
+  pB = strtok(NULL, ":");
+
   while(pB != NULL)
   {
     if ( p_map[i].cb_fill(p, pB) )
       return i;
     pB = strtok(NULL, ":");
+
+    if(!strncmp(pB, "#", 1))
+      break;
+
     i++;
   }
   

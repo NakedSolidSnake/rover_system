@@ -148,37 +148,37 @@ void Widget::loadSettings()
 
 void Widget::on_btForward_clicked()
 {
-    QString command = "0000:0012:move forward:FFFF";
+    QString command = "$:0000:0012:move forward:FFFF:#";
     out.writeRawData(command.toLocal8Bit(), command.size());
 }
 
 void Widget::on_btStop_clicked()
 {
-    QString command = "0000:0009:move stop:FFFF";
+    QString command = "$:0000:0009:move stop:FFFF:#";
     out.writeRawData(command.toLocal8Bit(), command.size());
 }
 
 void Widget::on_btLeft_clicked()
 {
-    QString command = "0000:0009:move left:FFFF";
+    QString command = "$:0000:0009:move left:FFFF:#";
     out.writeRawData(command.toLocal8Bit(), command.size());
 }
 
 void Widget::on_btRight_clicked()
 {
-    QString command = "0000:0010:move right:FFFF";
+    QString command = "$:0000:0010:move right:FFFF:#";
     out.writeRawData(command.toLocal8Bit(), command.size());
 }
 
 void Widget::on_btBackwards_clicked()
 {
-    QString command = "0000:0012:move reverse:FFFF";
+    QString command = "$:0000:0012:move reverse:FFFF:#";
     out.writeRawData(command.toLocal8Bit(), command.size());
 }
 
 void Widget::on_powerChanged(int value)
 {
-    QString command = QString("0000:0012:power %1:FFFF").arg(value);
+    QString command = QString("$:0000:0012:power %1:FFFF:#").arg(value);
     ui->lcdPower->display(value);
     out.writeRawData(command.toLocal8Bit(), command.size());
 }
@@ -197,25 +197,25 @@ void Widget::on_btLess_clicked()
 
 void Widget::on_btServoRight_clicked()
 {
-    QString command = "0001:0009:set right:FFFF";
+    QString command = "$:0001:0009:set right:FFFF:#";
     ui->dialServo->setValue(SERVO_RIGHT_POS);
 }
 
 void Widget::on_btServoCenter_clicked()
 {
-    QString command = "0001:0010:set center:FFFF";
+    QString command = "$:0001:0010:set center:FFFF:#";
     ui->dialServo->setValue(SERVO_CENTER_POS);
 }
 
 void Widget::on_btServoLeft_clicked()
 {
-    QString command = "0001:0008:set left:FFFF";
+    QString command = "$:0001:0008:set left:FFFF:#";
     ui->dialServo->setValue(SERVO_LEFT_POS);
 }
 
 void Widget::on_servoSetPosition(int value)
 {
-    QString command = QString("0001:0012:graus %1:FFFF").arg(value);
+    QString command = QString("$:0001:0012:graus %1:FFFF:#").arg(value);
     out.writeRawData(command.toLocal8Bit(), command.size());
 }
 
