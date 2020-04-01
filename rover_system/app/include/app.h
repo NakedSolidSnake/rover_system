@@ -25,9 +25,10 @@
 #define ROVER_PROCESS_SERVO     "./rover_servo_control"
 #define ROVER_PROCESS_MANAGER   "./rover_manager"
 #define ROVER_PROCESS_MQTT      "./rover_mqtt"
+#define ROVER_PROCESS_WEBSERVER "./rover_webserver"
 
 //Process amount
-#define PROCESS_AMOUNT 5
+#define PROCESS_AMOUNT 6
 
 typedef struct process
 {

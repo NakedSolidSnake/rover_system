@@ -9,7 +9,8 @@ process_t procs[] =
         {.pid = -1, .name = ROVER_PROCESS_SERVO},
         {.pid = -1, .name = ROVER_PROCESS_MANAGER},
         {.pid = -1, .name = ROVER_PROCESS_SERVER},
-        {.pid = -1, .name = ROVER_PROCESS_MQTT}
+        {.pid = -1, .name = ROVER_PROCESS_MQTT},
+        {.pid = -1, .name = ROVER_PROCESS_WEBSERVER}
     };
 
 int mem_init(MEM *mem)

@@ -140,3 +140,19 @@ target_include_directories(rover_mqtt
   ${CMAKE_CURRENT_LIST_DIR}/include
   )
 install(TARGETS rover_mqtt DESTINATION bin)
+
+
+#------------------------------------------------------------------------------------------------------
+# rover_webserver 
+#------------------------------------------------------------------------------------------------------
+add_executable(rover_webserver "")
+target_link_libraries(rover_webserver PUBLIC  ipc app comm)
+target_sources(rover_webserver
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/src/rover_webserver.c
+  )
+target_include_directories(rover_webserver 
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/include  
+  )
+install(TARGETS rover_webserver DESTINATION bin)
