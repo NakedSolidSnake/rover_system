@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7.0)
 
-project(rasp_rover)
+project(rover_rasp)
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
@@ -9,15 +9,16 @@ set(VERSION_PATCH 0)
 # This one is important
 SET(CMAKE_SYSTEM_NAME Linux)
 
-# Specify the cross compiler
-#set(CMAKE_C_COMPILER   arm-linux-gnueabihf-gcc)
-#set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
-
 set (CMAKE_C_FLAGS "-D_GNU_SOURCE -Wall -std=c99")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_INSTALL_PREFIX "/home/rover")
+set(CMAKE_INSTALL_PREFIX "/home/$ENV{USER}")
 set(CMAKE_BUILD_TYPE Debug)
+
+macro(install_symlink filepath sympath)
+    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${filepath} ${sympath})")
+    install(CODE "message(\"-- Created symlink: ${sympath} -> ${filepath}\")")
+endmacro(install_symlink)
 
 function(add_test_unit BIN_NAME BIN SOURCE)
   add_executable(${BIN} ${SOURCE})
@@ -32,7 +33,6 @@ enable_testing()
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/driver)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/app)
-# add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/libs)
 
 #------------------------------------------------------------------------------------------------------
 #Tests
@@ -58,16 +58,11 @@ set(CPACK_PACKAGE_CONTACT "support@acme.corp")
 set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/rover)
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-#set(CPACK_INSTALL_SCRIPT "{CMAKE_CURRENT_BINARY_DIR}/install.sh")
 include (CPack)
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/scripts/install.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/install.sh" @ONLY)
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/scripts/uninstall.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/uninstall.sh" @ONLY)
-
-# Create Symbolic links
+# Copy Files to dat dir
 install(FILES config/rover_syslog.conf DESTINATION dat)
+install(FILES config/rover.service DESTINATION dat)
 
-install(CODE "execute_process(COMMAND {CMAKE_CURRENT_BINARY_DIR}/install.sh)")
-
-
-#add_custom_command(TARGET ${CPACK_PACKAGE_FILE_NAME} POST_BUILD COMMAND bash install.sh WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
+install_symlink(${CMAKE_INSTALL_PREFIX}/rover/dat/rover.service /etc/systemd/system/rover.service)
+install_symlink(${CMAKE_INSTALL_PREFIX}/rover/dat/rover_syslog.conf /etc/rsyslog.d/rover_syslog.conf)

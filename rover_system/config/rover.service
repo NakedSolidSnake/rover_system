@@ -1,0 +1,15 @@
+[Unit]
+Description=Rover System
+After=network.target
+StartLimitIntervalSec=1
+
+[Service]
+Type=forking
+Restart=always
+RestartSec=1
+User=cssouza
+ExecStart=/home/cssouza/rover/bin/rover_launch
+ExecStop=/home/cssouza/rover/bin/rover_unlaunch
+
+[Install]
+WantedBy=multi-user.target
