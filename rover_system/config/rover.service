@@ -5,8 +5,12 @@ StartLimitIntervalSec=1
 
 [Service]
 Type=forking
-Restart=always
-RestartSec=1
+Restart=no
+TimeoutSec=5min
+IgnoreSIGPIPE=no
+KillMode=process
+GuessMainPID=no
+RemainAfterExit=yes
 User=cssouza
 ExecStart=/home/cssouza/rover/bin/rover_launch
 ExecStop=/home/cssouza/rover/bin/rover_unlaunch

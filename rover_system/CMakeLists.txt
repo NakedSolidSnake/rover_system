@@ -15,10 +15,7 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_INSTALL_PREFIX "/home/$ENV{USER}")
 set(CMAKE_BUILD_TYPE Debug)
 
-macro(install_symlink filepath sympath)
-    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${filepath} ${sympath})")
-    install(CODE "message(\"-- Created symlink: ${sympath} -> ${filepath}\")")
-endmacro(install_symlink)
+
 
 function(add_test_unit BIN_NAME BIN SOURCE)
   add_executable(${BIN} ${SOURCE})
@@ -49,6 +46,7 @@ target_link_libraries(test_ultrasonic PUBLIC drivers)
 #------------------------------------------------------------------------------------------------------
 #create a .deb file
 #------------------------------------------------------------------------------------------------------
+set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
 set(CPACK_PACKAGE_DESCRIPTION "Rover package")
 set(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
@@ -58,11 +56,11 @@ set(CPACK_PACKAGE_CONTACT "support@acme.corp")
 set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/rover)
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+#call script to create a symbolic link
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/config/postinst")
 include (CPack)
 
 # Copy Files to dat dir
-install(FILES config/rover_syslog.conf DESTINATION dat)
-install(FILES config/rover.service DESTINATION dat)
+install(FILES config/rover_syslog.conf PERMISSIONS OWNER_WRITE OWNER_READ DESTINATION dat)
+install(FILES config/rover.service PERMISSIONS OWNER_WRITE OWNER_READ DESTINATION dat)
 
-install_symlink(${CMAKE_INSTALL_PREFIX}/rover/dat/rover.service /etc/systemd/system/rover.service)
-install_symlink(${CMAKE_INSTALL_PREFIX}/rover/dat/rover_syslog.conf /etc/rsyslog.d/rover_syslog.conf)

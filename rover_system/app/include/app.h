@@ -3,7 +3,7 @@
 
 #include <sharedmemory/sharedmemory.h>
 
-#define PROC_NAME_MAX     30
+#define PROC_NAME_MAX     80
 
 // Queue id's
 #define QUEUE_MANAGER_ID  100
@@ -20,12 +20,12 @@
 #define SHM_PROCESSES_KEY   4
 
 //process names
-#define ROVER_PROCESS_SERVER    "./rover_server"
-#define ROVER_PROCESS_MOTOR     "./rover_motor_control"
-#define ROVER_PROCESS_SERVO     "./rover_servo_control"
-#define ROVER_PROCESS_MANAGER   "./rover_manager"
-#define ROVER_PROCESS_MQTT      "./rover_mqtt"
-#define ROVER_PROCESS_WEBSERVER "./rover_webserver"
+#define ROVER_PROCESS_SERVER    "/home/cssouza/rover/bin/rover_server"
+#define ROVER_PROCESS_MOTOR     "/home/cssouza/rover/bin/rover_motor_control"
+#define ROVER_PROCESS_SERVO     "/home/cssouza/rover/bin/rover_servo_control"
+#define ROVER_PROCESS_MANAGER   "/home/cssouza/rover/bin/rover_manager"
+#define ROVER_PROCESS_MQTT      "/home/cssouza/rover/bin/rover_mqtt"
+#define ROVER_PROCESS_WEBSERVER "/home/cssouza/rover/bin/rover_webserver"
 
 //Process amount
 #define PROCESS_AMOUNT 6
