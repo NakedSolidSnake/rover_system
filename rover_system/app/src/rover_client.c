@@ -25,12 +25,15 @@ void signal_handler(int sig)
 {
 }
 
+static int getSelection(void);
+
 void func(int sockfd)
 {
-    int i = 0;
-    protocol_t proto[2] = {
+    int idx = 0;
+    protocol_t proto[] = {
             { 0, 12, "move forward", 0xFFFF},
-			{ 1, 9 , "turn left"   , 0xAAAA}
+			{ 1, 9 , "turn left"   , 0xAAAA},
+            { 2, 8 , "distance"   , 0xCCCC},
         };
     client_st cl;
     char server_b[MAX];
@@ -40,14 +43,16 @@ void func(int sockfd)
         bzero(cl.buff, sizeof(cl.buff));
         bzero(server_b, sizeof(server_b));
 
-        
-        protocol_mount(&proto[i], server_b, MAX);
-        if(i)
-            i = 0;
-        else
-        {
-            i = 1;
-        }
+        idx = getSelection();
+
+        if(idx >= 0){
+
+            if(idx == 9){
+                printf("Quitting...\n");
+                break; ;
+            }
+
+        protocol_mount(&proto[idx], server_b, MAX);       
         
 
         write(sockfd, server_b, sizeof(server_b));
@@ -59,6 +64,7 @@ void func(int sockfd)
          bzero(cl.buff, sizeof(cl.buff));
         recv(sockfd, cl.buff, sizeof(cl.buff), 0);
         printf("%s\n", cl.buff);
+        }      
     }
 }
 
@@ -98,4 +104,21 @@ int main()
 
     // close the socket
     close(sockfd);
+}
+
+static int getSelection(void)
+{
+    int choose;
+    printf("[0] - Send to Motor Command.\n");
+    printf("[1] - Send to Servo Command.\n");
+    printf("[2] - Send to Ultrasound Command.\n");
+    printf("[9] - Quit.\n");
+
+    scanf("%d", &choose);
+
+    if(choose >= 0 && choose <= 2){
+        return choose;
+    }
+
+    return -1;
 }

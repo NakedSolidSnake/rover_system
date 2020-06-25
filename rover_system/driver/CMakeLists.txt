@@ -22,6 +22,7 @@ target_sources(drivers
   ${CMAKE_CURRENT_LIST_DIR}/arch/${FOLDER}/src/servo.c
   ${CMAKE_CURRENT_LIST_DIR}/src/servo_action.c
   ${CMAKE_CURRENT_LIST_DIR}/src/motors_action.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/ultrasound_action.c
 )
 
 target_include_directories(drivers 

@@ -13,6 +13,12 @@ typedef struct servo{
   char command[64];
 }servo_st;
 
+typedef struct ultrasound{
+  int id;
+  int status;
+  char command[64];
+}ultrasound_st;
+
 #define MOTOR_OFFSET      0
 #define SERVO_OFFSET      (MOTOR_OFFSET + sizeof(motor_st))
 

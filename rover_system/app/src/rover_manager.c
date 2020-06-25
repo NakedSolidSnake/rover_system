@@ -86,6 +86,13 @@ int manager(int id, const char *command, MEM *mem)
       dev = &mem->servo;
       strncpy(proc, ROVER_PROCESS_SERVO, strlen(ROVER_PROCESS_SERVO));
       break;
+
+    case ULTRASOUND_ID:
+      dev = &mem->ultrasound;
+      strncpy(proc, ROVER_PROCESS_ULTRASOUND, strlen(ROVER_PROCESS_ULTRASOUND));
+      break;
+
+      
     
     default: 
       return -1;

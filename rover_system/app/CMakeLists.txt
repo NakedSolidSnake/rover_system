@@ -85,6 +85,20 @@ target_include_directories(rover_servo_control
   )
 install(TARGETS rover_servo_control DESTINATION bin)
 
+#rover_ultrasound_control
+add_executable(rover_ultrasound_control "")
+target_link_libraries(rover_ultrasound_control PUBLIC ipc drivers app)
+target_sources(rover_ultrasound_control
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/src/rover_ultrasound_control.c
+  )
+target_include_directories(rover_ultrasound_control
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/include
+  ${CMAKE_CURRENT_LIST_DIR}/driver/include
+  )
+install(TARGETS rover_ultrasound_control DESTINATION bin)
+
 #rover_launch
 add_executable(rover_launch "")
 target_link_libraries(rover_launch PUBLIC ipc app)
