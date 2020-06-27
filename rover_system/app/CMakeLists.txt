@@ -99,6 +99,20 @@ target_include_directories(rover_ultrasound_control
   )
 install(TARGETS rover_ultrasound_control DESTINATION bin)
 
+#rover_lcd16_control
+add_executable(rover_lcd16_control "")
+target_link_libraries(rover_lcd16_control PUBLIC ipc drivers app)
+target_sources(rover_lcd16_control
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/src/rover_lcd16_control.c
+  )
+target_include_directories(rover_lcd16_control
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/include
+  ${CMAKE_CURRENT_LIST_DIR}/driver/include
+  )
+install(TARGETS rover_lcd16_control DESTINATION bin)
+
 #rover_launch
 add_executable(rover_launch "")
 target_link_libraries(rover_launch PUBLIC ipc app)

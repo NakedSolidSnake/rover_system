@@ -92,6 +92,11 @@ int manager(int id, const char *command, MEM *mem)
       strncpy(proc, ROVER_PROCESS_ULTRASOUND, strlen(ROVER_PROCESS_ULTRASOUND));
       break;
 
+    case LCD16_ID:
+      dev = &mem->lcd16;
+      strncpy(proc, ROVER_PROCESS_LCD16, strlen(ROVER_PROCESS_LCD16));
+      break;
+
       
     
     default: 

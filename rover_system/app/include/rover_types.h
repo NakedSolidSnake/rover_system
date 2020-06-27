@@ -19,6 +19,12 @@ typedef struct ultrasound{
   char command[64];
 }ultrasound_st;
 
+typedef struct lcd16{
+  int id;
+  int status;
+  char command[64];
+}lcd16_st;
+
 #define MOTOR_OFFSET      0
 #define SERVO_OFFSET      (MOTOR_OFFSET + sizeof(motor_st))
 

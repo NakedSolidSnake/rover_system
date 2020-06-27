@@ -7,4 +7,5 @@
 int ultrasound_action_select(const char *action, int action_len)
 {
     printf("%s\n", action);
+    return 0;
 }

@@ -11,7 +11,8 @@ process_t procs[] =
         {.pid = -1, .name = ROVER_PROCESS_SERVER},
         {.pid = -1, .name = ROVER_PROCESS_MQTT},
         {.pid = -1, .name = ROVER_PROCESS_WEBSERVER},
-        {.pid = -1, .name = ROVER_PROCESS_ULTRASOUND}
+        {.pid = -1, .name = ROVER_PROCESS_ULTRASOUND},
+        {.pid = -1, .name = ROVER_PROCESS_LCD16}
     };
 
 int mem_init(MEM *mem)

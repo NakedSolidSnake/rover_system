@@ -24,12 +24,13 @@
 #define ROVER_PROCESS_MOTOR         "/home/cssouza/rover/bin/rover_motor_control"
 #define ROVER_PROCESS_SERVO         "/home/cssouza/rover/bin/rover_servo_control"
 #define ROVER_PROCESS_ULTRASOUND    "/home/cssouza/rover/bin/rover_ultrasound_control"
+#define ROVER_PROCESS_LCD16         "/home/cssouza/rover/bin/rover_lcd16_control"
 #define ROVER_PROCESS_MANAGER       "/home/cssouza/rover/bin/rover_manager"
 #define ROVER_PROCESS_MQTT          "/home/cssouza/rover/bin/rover_mqtt"
 #define ROVER_PROCESS_WEBSERVER     "/home/cssouza/rover/bin/rover_webserver"
 
 //Process amount
-#define PROCESS_AMOUNT 7
+#define PROCESS_AMOUNT 8
 
 typedef struct process
 {
@@ -52,6 +53,7 @@ typedef struct MEM
   generic_st motor;
   generic_st servo;
   generic_st ultrasound;
+  generic_st lcd16;
 }MEM;
 
 
