@@ -84,6 +84,11 @@ void Widget::on_btSend_clicked()
     if(buffer.isEmpty() || buffer.isNull()) //launch exception
         return;
 
+    if(ui->chkNewLine->isChecked())
+        buffer += "\n";
+    if(ui->chkCarriageReturn->isChecked())
+        buffer += "\r";
+
     qDebug() << buffer;
 
     out.writeRawData(buffer.toLocal8Bit(), buffer.size());
