@@ -16,6 +16,8 @@
 #define ROVER_MOTOR_POWER_TOPIC     "/rover/motor/power"
 #define ROVER_MOTOR_DIR_TOPIC       "/rover/motor/direction"
 #define ROVER_SERVO_TOPIC           "/rover/servo/position"
+#define ROVER_LCD16_TOPIC           "/rover/lcd16/message"
+#define ROVER_ULTRASOUND_TOPIC      "/rover/ultrasound/distance"
 
 static void publishMotor(MQTTClient client, const char *command);
 static void publishMotorPower(MQTTClient client, const char *command);
@@ -121,7 +123,7 @@ static void publishServo(MQTTClient client, const char *command)
 
   sscanf(command, "%s", action);
 
-  if (!strncmp(command, "move", strlen("move")))
+  if (!strncmp(command, "graus", strlen("graus")))
   {
     p = (char *)(command + strlen(action) + 1); //points to next string
     strncpy(data, p, 10);
