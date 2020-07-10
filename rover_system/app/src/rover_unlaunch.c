@@ -6,6 +6,7 @@
 #include <log/log.h>
 #include <app.h>
 #include <sharedmemory/sharedmemory.h>
+#include <semaphore/semaphore.h>
 #include <queue/queue.h>
 
 #define ROVER_UNLAUNCH "ROVER_UNLAUNCH"
@@ -31,6 +32,8 @@ int main()
   queue_destroy(mem->queueid);  
 
   sharedMemoryDestroy(&mem->shm);
+
+  semaphore_destroy(&mem->sema);
 
   return EXIT_SUCCESS;
 }

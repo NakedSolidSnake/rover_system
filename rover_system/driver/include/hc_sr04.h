@@ -5,6 +5,6 @@
 #define ECHO        25
 
 int HC_SR04_init(void);
-int HC_SR04_getCM(void);
+float HC_SR04_getCM(void);
 
 #endif

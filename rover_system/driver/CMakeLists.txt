@@ -5,12 +5,13 @@ add_library(drivers "")
 
 if(${ARCH} STREQUAL "RASPBERRY")
   message("-- Created ${ARCH} compilation.")  
-  target_link_libraries(drivers PUBLIC wiringPi)
+  target_link_libraries(drivers PUBLIC wiringPi app)
   set (FOLDER "raspberry")  
 endif()
 
 if(${ARCH} STREQUAL "PC")
-  message("-- Created ${ARCH} compilation.")  
+  message("-- Created ${ARCH} compilation.") 
+  target_link_libraries(drivers PUBLIC app) 
   set (FOLDER "pc")
 
 endif()

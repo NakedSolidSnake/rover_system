@@ -10,7 +10,7 @@ int HC_SR04_init(void)
   return EXIT_SUCCESS;
 }
 
-int HC_SR04_getCM(void)
+float HC_SR04_getCM(void)
 {
   return (rand() % 100) + 50;
 }

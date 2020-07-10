@@ -2,11 +2,14 @@
 #define __APP_H
 
 #include <sharedmemory/sharedmemory.h>
+#include <semaphore/semaphore.h>
+#include <rover_status.h>
 
 #define PROC_NAME_MAX     80
 
 // Queue id's
 #define QUEUE_MANAGER_ID  100
+#define QUEUE_SERVER_ID   101
 
 // Semaphore id's
  
@@ -50,10 +53,12 @@ typedef struct MEM
   process_t procs[PROCESS_AMOUNT];
   shm_t shm;
   int queueid;
+  sema_t sema;
   generic_st motor;
   generic_st servo;
   generic_st ultrasound;
   generic_st lcd16;
+  Status_st status;  
 }MEM;
 
 

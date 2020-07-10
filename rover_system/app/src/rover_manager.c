@@ -10,10 +10,17 @@
 #include <log/log.h>
 #include <app.h>
 #include <protocol.h>
+#include <semaphore/semaphore.h>
 
 #define ROVER_MANAGER   "ROVER_MANAGER"
 
 static int queue_id = -1;
+static  sema_t sema = {
+        .id = -1,
+        .sema_count = 1,
+        .state = LOCKED,
+        .master = SLAVE
+    };
 
 static void signal_handler(int sig){
   if(sig == SIGTERM){
@@ -39,6 +46,8 @@ int main()
     exit(EXIT_FAILURE);
   }
 
+  semaphore_init(&sema, 1234);
+
   mem = mem_get();
   if(mem == NULL)
   {
@@ -50,8 +59,9 @@ int main()
 
   while(1)
   {
-    if(queue_recv(queue_id, &queue, sizeof(queue.bData)) < 0){
+    if(queue_recv(queue_id, &queue, sizeof(queue.bData), 0) < 0){
       logger(LOGGER_INFO, ROVER_MANAGER, "Queue receive error.");
+      continue;
     } 
 
     //convert to generic type to analise which id is.    
@@ -96,15 +106,18 @@ int manager(int id, const char *command, MEM *mem)
       dev = &mem->lcd16;
       strncpy(proc, ROVER_PROCESS_LCD16, strlen(ROVER_PROCESS_LCD16));
       break;
-
       
     
     default: 
       return -1;
   }
 
-  memset(dev->command, 0, sizeof(dev->command));
-  memcpy(dev->command, command, strlen(command));
+  if (semaphore_lock(&sema) == 0)
+  {
+    memset(dev->command, 0, sizeof(dev->command));
+    memcpy(dev->command, command, strlen(command));
+    semaphore_unlock(&sema);
+  }
 
   emitSignal(proc, mem);
   return EXIT_SUCCESS;

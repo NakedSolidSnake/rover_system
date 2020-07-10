@@ -8,6 +8,7 @@
 #include <sharedmemory/sharedmemory.h>
 #include <queue/queue.h>
 #include <signal/signal.h>
+#include <semaphore/semaphore.h>
 #include <app.h>
 
 #define BBSIZE       128
@@ -22,6 +23,18 @@ int main()
   MEM mem ;
 
   memset(&mem, 0, sizeof(MEM));
+
+  mem.sema.id = -1;
+  mem.sema.sema_count = 1;
+  mem.sema.state = LOCKED;
+  mem.sema.master = MASTER;
+
+  semaphore_init(&mem.sema, 1234);
+  if(mem.sema.id < 0)
+  {
+    logger(LOGGER_INFO, ROVER_LAUNCH, "Semaphore init failed");
+    exit(1);
+  }
 
   mem.queueid = queue_init(QUEUE_MANAGER_ID);
   if (mem.queueid < 0)

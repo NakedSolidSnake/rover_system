@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <app.h>
+
+static MEM *mem = NULL;
 
 typedef struct tab_mov
 {
@@ -30,6 +33,12 @@ int servo_action_select(const char *action, int action_len)
   int position = 0;
   int ret = 0;
 
+  mem = mem_get();
+  if(mem == NULL)
+  {    
+    return 1;
+  }
+
   sscanf(action, "%s", command);
 
   if (!strncmp(command, SET, strlen(SET)))
@@ -44,6 +53,7 @@ int servo_action_select(const char *action, int action_len)
     sscanf(action, "%s %d", data, &position);
     //call function
     ret = SERVO_setAngle(position);
+    mem->status.servo_status.position = position;
   }
 
   return ret;

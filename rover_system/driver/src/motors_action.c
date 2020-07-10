@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <app.h>
 
 typedef struct tab_mov
 {
@@ -10,6 +11,9 @@ typedef struct tab_mov
   int (*cb_mov)(int sense);
   int sense;
 } tab_mov_t;
+
+static MEM *mem = NULL;
+
 
 static const tab_mov_t movements[] =
 {
@@ -32,19 +36,26 @@ int motors_action_select(const char *action, int action_len)
   int power = 0;
   int ret = 0;
 
+  mem = mem_get();
+  if(mem == NULL)
+  {    
+    return 1;
+  }
+
   sscanf(action, "%s", command);
 
   if (!strncmp(command, MOVE, strlen(MOVE)))
   {
     p = (char *)(action + strlen(command) + 1); //points to next string
     strncpy(data, p, 10);
-    //call functions
+    //call functions    
     ret = motors_action(p);
   }
   else if (!strncmp(command, POWER, strlen(POWER)))
   {
     sscanf(action, "%s %d", data, &power);
     //call function
+    mem->status.motor_status.power = power;
     ret = MOTORS_setPower(power);
   }
   
@@ -60,7 +71,9 @@ static int motors_action(const char *command)
     tab_mov_t *comm = (tab_mov_t *)&movements[i];
     if (!strncmp(command, comm->mov, strlen(comm->mov)))
     {
+      mem->status.motor_status.direction = comm->sense;
       ret = comm->cb_mov(comm->sense);
+      mem->status.motor_status.direction = comm->sense;
       break;
     }
   }

@@ -9,6 +9,7 @@
 #include <motors_action.h>
 #include <motors.h>
 #include <app.h>
+#include <semaphore/semaphore.h>
 
 #define ROVER_MOTOR   "ROVER_MOTOR"
 
@@ -17,6 +18,12 @@ static int _update = 0;
 void update(int s);
 void end_motor(int s);
 
+static sema_t sema = {
+        .id = -1,
+        .sema_count = 1,
+        .state = LOCKED,
+        .master = SLAVE
+    };
 
 int main()
 {
@@ -25,6 +32,8 @@ int main()
   MEM *mem = NULL;
 
   MOTORS_init();
+
+  semaphore_init(&sema, 1234);
 
   signal_register(update, SIGUSR1);
   signal_register(end_motor, SIGTERM);
@@ -40,13 +49,19 @@ int main()
   
   while(1)
   {
-    if(_update == 1){
+    if (_update == 1)
+    {
       memcpy(&motores, &mem->motor, sizeof(motores));
       logger(LOGGER_INFO, ROVER_MOTOR, motores.command);
       //call command here
-      motors_action_select(motores.command, strlen(motores.command));
+      if (semaphore_lock(&sema) == 0)
+      {
+        motors_action_select(motores.command, strlen(motores.command));
+        semaphore_unlock(&sema);
+      }
+
       _update = 0;
-    } 
+    }
     else{
       pause();
     }
