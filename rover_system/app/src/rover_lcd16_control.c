@@ -32,7 +32,7 @@ int main()
   lcd16_st lcd16;
   MEM *mem = NULL;
 
-  semaphore_init(&sema, 1234);
+  semaphore_init(&sema, SEMA_ID);
 
   LCD16_init();
 

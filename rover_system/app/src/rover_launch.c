@@ -29,7 +29,7 @@ int main()
   mem.sema.state = LOCKED;
   mem.sema.master = MASTER;
 
-  semaphore_init(&mem.sema, 1234);
+  semaphore_init(&mem.sema, SEMA_ID);
   if(mem.sema.id < 0)
   {
     logger(LOGGER_INFO, ROVER_LAUNCH, "Semaphore init failed");

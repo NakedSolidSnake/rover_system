@@ -12,7 +12,7 @@
 #define QUEUE_SERVER_ID   101
 
 // Semaphore id's
- 
+#define SEMA_ID           1234 
 
 // Shared Memory id's
 

@@ -46,7 +46,7 @@ int main()
     exit(EXIT_FAILURE);
   }
 
-  semaphore_init(&sema, 1234);
+  semaphore_init(&sema, SEMA_ID);
 
   mem = mem_get();
   if(mem == NULL)

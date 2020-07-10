@@ -33,7 +33,7 @@ int main()
 
   MOTORS_init();
 
-  semaphore_init(&sema, 1234);
+  semaphore_init(&sema, SEMA_ID);
 
   signal_register(update, SIGUSR1);
   signal_register(end_motor, SIGTERM);
