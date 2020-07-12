@@ -6,6 +6,7 @@
 #include <QLCDNumber>
 #include <QSlider>
 #include <QKeyEvent>
+#include <QMessageBox>
 
 #define SERVO_LEFT_POS      29
 #define SERVO_CENTER_POS    73
@@ -28,7 +29,7 @@ Widget::Widget(QWidget *parent)
 
     loadSettings();
 
-    ui->leSend->setText("0001:0004:size:FFFF");
+    ui->leSend->setText("$:0001:0004:size:FFFF:#");
 
     ui->vsPower->setMaximum(1000);
     ui->dialServo->setMinimum(29);
@@ -48,7 +49,11 @@ void Widget::socketReady()
 
 void Widget::stateChanged(QAbstractSocket::SocketState socketState)
 {
-    qDebug() << socketState;
+//    qDebug() << socketState;
+    if(socketState == QAbstractSocket::SocketState::UnconnectedState)
+    {
+        on_btDisconnect_clicked();
+    }
 }
 
 void Widget::on_btConnect_clicked()
@@ -63,6 +68,7 @@ void Widget::on_btConnect_clicked()
 
     connect(mSocket, &QTcpSocket::connected, this, &Widget::socketReady);
     connect(mSocket, &QTcpSocket::stateChanged,this,&Widget::stateChanged);
+    connect(mSocket, &QTcpSocket::readyRead,this,&Widget::on_ReadyRead);
     connect(ui->vsPower, &QSlider::valueChanged, this, &Widget::on_powerChanged);
     connect(ui->dialServo, &QDial::valueChanged, this, &Widget::on_servoSetPosition);
 
@@ -89,7 +95,6 @@ void Widget::on_btSend_clicked()
     if(ui->chkCarriageReturn->isChecked())
         buffer += "\r";
 
-    qDebug() << buffer;
 
     out.writeRawData(buffer.toLocal8Bit(), buffer.size());
 }
@@ -105,6 +110,18 @@ void Widget::buttonState(bool state)
 
     ui->gbCommand->setEnabled(!state);
     ui->gbServo->setEnabled(!state);
+
+    //panel Ultrasound
+    ui->btRead->setEnabled(!state);
+    ui->leTime->setEnabled(!state);
+    ui->cbPeriodic->setEnabled(!state);
+
+    //panel LCD
+    ui->btSendLCD->setEnabled(!state);
+    ui->sbLcd->setEnabled(!state);
+    ui->leLCD->setEnabled(!state);
+
+
 
 }
 
@@ -135,7 +152,7 @@ void Widget::loadSettings()
 
         if(it.key() == "host"){
             if(!it.value().isEmpty()){
-                 ui->leIP->setText(it.value());
+                ui->leIP->setText(it.value());
             }else {
                 ui->leIP->setText("localhost");
             }
@@ -143,7 +160,7 @@ void Widget::loadSettings()
 
         if(it.key() == "port"){
             if(!it.value().isEmpty()){
-                 ui->lePort->setText(it.value());
+                ui->lePort->setText(it.value());
             }else {
                 ui->lePort->setText("1234");
             }
@@ -236,4 +253,68 @@ void Widget::on_savePortSettings()
     QMap<QString, QString> key;
     key["port"] = ui->lePort->text();
     persistConfig.save("config", key);
+}
+
+void Widget::on_cbPeriodic_toggled(bool checked)
+{
+    static bool running = false;
+    int time = 0;
+    if(!ui->leTime->text().isEmpty()){
+        time = ui->leTime->text().toInt();
+    }else{
+        ui->cbPeriodic->setChecked(false);
+    }
+
+
+    if(checked && time > 0 && !running){
+        running = true;
+        mTimerUltrasound.setInterval(time * 1000);
+        mTimerUltrasound.setSingleShot(false);
+        mTimerUltrasound.start();
+        connect(&mTimerUltrasound, &QTimer::timeout, this, &Widget::on_getDistance);
+
+    }else if(running && !checked){
+        running = false;
+        mTimerUltrasound.stop();
+    }
+}
+
+void Widget::on_btRead_clicked()
+{
+    on_getDistance();
+}
+
+void Widget::on_btSendLCD_clicked()
+{
+    if(ui->leLCD->text().length() > 16)
+    {
+        QMessageBox::warning(this, "Error", "This field cannot be greater than 16", QMessageBox::Button::Cancel);
+        ui->leLCD->clear();
+        return ;
+    }
+    QString msg = QString::number(ui->sbLcd->value()) + "-" + ui->leLCD->text();
+    if(!msg.isEmpty()){
+        QString command;
+        command.sprintf("$:0003:%04d:%s:FFFF:#", msg.length(), msg.toUtf8().data());
+        out.writeRawData(command.toLocal8Bit(), command.size());
+    }
+
+}
+
+void Widget::on_getDistance()
+{
+    const QString msg = "distance";
+
+    QString command;
+    command.sprintf("$:0002:%04d:%s:FFFF:#", msg.length(), msg.toUtf8().data());
+    out.writeRawData(command.toLocal8Bit(), command.size());
+}
+
+void Widget::on_ReadyRead()
+{
+    QByteArray data = mSocket->readAll();
+
+    QString d = data;
+
+    qDebug() << "Received: " << d;
 }

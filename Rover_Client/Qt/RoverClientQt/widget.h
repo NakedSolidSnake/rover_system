@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QDataStream>
 #include "persistconfig.h"
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -17,6 +18,13 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
+
+    enum{
+      MOTOR_ID = 0,
+      SERVO_ID,
+      ULTRASOUND_ID,
+      LCD_ID
+    };
 
 private:
     void buttonState(bool state);
@@ -43,6 +51,11 @@ private slots:
     void on_servoSetPosition(int value);
     void on_saveHostSettings(void);
     void on_savePortSettings(void);
+    void on_cbPeriodic_toggled(bool checked);
+    void on_btRead_clicked();
+    void on_btSendLCD_clicked();
+    void on_getDistance();
+    void on_ReadyRead();
 
 private:
     Ui::Widget *ui;
@@ -50,5 +63,6 @@ private:
     bool mSocketReady;
     QDataStream out;
     PersistConfig persistConfig;
+    QTimer mTimerUltrasound;
 };
 #endif // WIDGET_H
