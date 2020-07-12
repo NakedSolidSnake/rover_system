@@ -18,30 +18,37 @@ static int receive(char *buffer, int size);
 void end_server(int s);
 
 static int queue_id = -1;
+static int queue_server_id = -1;
 static queue_st queue;
 
 // Driver function
 int main()
 {
-  Server_t server = 
-  {
-    .socket = -1,
-    .port = "8080",
-    .cb.recv = receive,
-    .cb.send = sender
-  };
+  Server_t server =
+      {
+          .socket = -1,
+          .port = "8080",
+          .cb.recv = receive,
+          .cb.send = sender};
 
   signal_register(end_server, SIGTERM);
 
   queue_id = queue_init(QUEUE_MANAGER_ID);
   if (queue_id < 0)
   {
-    logger(LOGGER_INFO, ROVER_SERVER, "Queue init failed");
+    logger(LOGGER_INFO, ROVER_SERVER, "Queue Manager init failed");
+    exit(1);
+  }
+
+  queue_server_id = queue_init(QUEUE_SERVER_ID);
+  if (queue_server_id < 0)
+  {
+    logger(LOGGER_INFO, ROVER_SERVER, "Queue Server init failed");
     exit(1);
   }
 
   Server_init(&server);
-  Server_exec(&server);  
+  Server_exec(&server);
 }
 
 void end_server(int s)
@@ -51,23 +58,30 @@ void end_server(int s)
 }
 
 static int sender(char *buffer, int *size)
-{    
-    char message[] = "OK";
-    *size = strlen(message);
-    strncpy(buffer, message, *size);
+{
+  logger(LOGGER_INFO, ROVER_SERVER, "Server send.");
+
+  if (queue_recv(queue_server_id, &queue, sizeof(queue.bData), 150000000) < 0)
+  {
+    *size = 0;
     return 0;
+  }
+  
+  memcpy(buffer, queue.bData, MAX_BUFFER_SEND_RECV);
+  *size = strlen(buffer);
+  return 0;
 }
 
 static int receive(char *buffer, int size)
 {
-    int ret = -1;    
-    memcpy(queue.bData, buffer, sizeof(protocol_t));
-    queue.queueType = 1;
-    ret = queue_send(queue_id, &queue, sizeof(protocol_t));
-    if (ret < 0)    
-      logger(LOGGER_INFO, ROVER_SERVER, "Error Queue Send.");
+  int ret = -1;
+  memcpy(queue.bData, buffer, sizeof(protocol_t));
+  queue.queueType = 1;
+  ret = queue_send(queue_id, &queue, sizeof(protocol_t));
+  if (ret < 0)
+    logger(LOGGER_INFO, ROVER_SERVER, "Error Queue Send.");
 
-    memset(buffer, 0, MAX_BUFFER_SEND_RECV);
-    
-    return 0;
+  memset(buffer, 0, MAX_BUFFER_SEND_RECV);
+
+  return 0;
 }

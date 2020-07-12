@@ -53,6 +53,7 @@ typedef struct MEM
   process_t procs[PROCESS_AMOUNT];
   shm_t shm;
   int queueid;
+  int queue_server_id;
   sema_t sema;
   generic_st motor;
   generic_st servo;
@@ -60,6 +61,13 @@ typedef struct MEM
   generic_st lcd16;
   Status_st status;  
 }MEM;
+
+typedef enum TYPE{
+  MOTOR_ID = 0,
+  SERVO_ID,
+  ULTRASOUND_ID,
+  LCD16_ID
+}TYPE_e;
 
 
 int mem_init(MEM *mem);

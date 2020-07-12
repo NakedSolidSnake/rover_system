@@ -39,7 +39,14 @@ int main()
   mem.queueid = queue_init(QUEUE_MANAGER_ID);
   if (mem.queueid < 0)
   {
-    logger(LOGGER_INFO, ROVER_LAUNCH, "Queue init failed");
+    logger(LOGGER_INFO, ROVER_LAUNCH, "Queue Manager init failed");
+    exit(1);
+  }
+
+  mem.queue_server_id = queue_init(QUEUE_SERVER_ID);
+  if (mem.queue_server_id < 0)
+  {
+    logger(LOGGER_INFO, ROVER_LAUNCH, "Queue Server init failed");
     exit(1);
   }
 

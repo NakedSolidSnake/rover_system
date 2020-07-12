@@ -10,6 +10,7 @@
 #include <hc_sr04.h>
 #include <app.h>
 #include <semaphore/semaphore.h>
+#include <queue/queue.h>
 
 #define ROVER_ULTRASOUND   "ROVER_ULTRASOUND"
 
@@ -28,7 +29,7 @@ void end_ultrasound(int s);
 
 int main()
 {
-
+  queue_st queue;
   ultrasound_st ultrasound;
   MEM *mem = NULL;
 
@@ -57,6 +58,8 @@ int main()
       if (semaphore_lock(&sema) == 0)
       {
         ultrasound_action_select(ultrasound.command, strlen(ultrasound.command));
+        snprintf(queue.bData, sizeof(queue.bData) ,"$:%04d:%04d:%s:FFFF:#", ULTRASOUND_ID, (int)strlen(ultrasound.command), ultrasound.command);
+        queue_send(mem->queue_server_id, &queue, (int)strlen(ultrasound.command) + 1);
         semaphore_unlock(&sema);
       }
       _update = 0;

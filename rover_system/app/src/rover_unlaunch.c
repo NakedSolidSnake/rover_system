@@ -30,6 +30,7 @@ int main()
   }
 
   queue_destroy(mem->queueid);  
+  queue_destroy(mem->queue_server_id);
 
   sharedMemoryDestroy(&mem->shm);
 

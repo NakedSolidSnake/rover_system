@@ -10,6 +10,7 @@
 #include <lcd16.h>
 #include <app.h>
 #include <semaphore/semaphore.h>
+#include <queue/queue.h>
 
 #define ROVER_LCD16   "ROVER_LCD16"
 
@@ -31,6 +32,7 @@ int main()
 
   lcd16_st lcd16;
   MEM *mem = NULL;
+  queue_st queue;
 
   semaphore_init(&sema, SEMA_ID);
 
@@ -57,6 +59,9 @@ int main()
       if (semaphore_lock(&sema) == 0)
       {
         lcd16_action_select(lcd16.command, strlen(lcd16.command));
+        queue.queueType = 1;
+        snprintf(queue.bData, sizeof(queue.bData) ,"$:%04d:%04d:%s:FFFF:#", LCD16_ID, (int)strlen(mem->status.lcd16_status.msg_line1), mem->status.lcd16_status.msg_line1);        
+        queue_send(mem->queue_server_id, &queue, (int)strlen(mem->status.lcd16_status.msg_line1) + 1);
         semaphore_unlock(&sema);
       }
       _update = 0;

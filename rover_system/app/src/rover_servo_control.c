@@ -10,6 +10,7 @@
 #include <servo.h>
 #include <app.h>
 #include <semaphore/semaphore.h>
+#include <queue/queue.h>
 
 #define ROVER_SERVO "ROVER_SERVO"
 
@@ -29,6 +30,7 @@ void end_servo(int s);
 int main()
 {
 
+  queue_st queue;
   servo_st servo;
   MEM *mem = NULL;
 
@@ -59,6 +61,9 @@ int main()
       if (semaphore_lock(&sema) == 0)
       {
         servo_action_select(servo.command, strlen(servo.command));
+        queue.queueType = 1;
+        snprintf(queue.bData, sizeof(queue.bData) ,"$:%04d:%04d:%s:FFFF:#", SERVO_ID, (int)strlen(servo.command), servo.command);
+        queue_send(mem->queue_server_id, &queue, (int)strlen(servo.command) + 1);
         semaphore_unlock(&sema);
       }
       _update = 0;

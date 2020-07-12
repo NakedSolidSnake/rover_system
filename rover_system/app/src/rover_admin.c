@@ -10,6 +10,12 @@
 #define ARGS_REQ 1
 #define ARGS_OPT 2
 
+typedef struct commands
+{
+  char command[30];
+  int id;
+}commands_st;
+
 typedef enum opt_e
 {
   OPT_HELP = 0,
@@ -186,7 +192,7 @@ static int shm(char **args, MEM *mem)
     return -1;
 
   while (fgets(command_out, sizeof(command_out), pipe) != NULL)
-    printf("%s\n", command_out);
+    printf("%s", command_out);
 
   pclose(pipe);
 
@@ -222,21 +228,33 @@ static int queue(char **args, MEM *mem)
 {
   (void)args;
 
+  commands_st commands[] = 
+  {
+    {.command = "ipcs -q | grep %08x", .id = QUEUE_MANAGER_ID},
+    {.command = "ipcs -q | grep %08x", .id = QUEUE_SERVER_ID},
+  };
+
+  int commands_amount = sizeof(commands)/sizeof(commands[0]);
+
   FILE *pipe;
-  char command[256] = {0};
-  char command_out[256] = {0};
-  printf("QUEUE_MANAGER_ID\n");
-  snprintf(command, sizeof(command), "ipcs -q | grep %08x", QUEUE_MANAGER_ID);
+  char command[256];
+  char command_out[256];
+  printf("QUEUE_ID's\n");
+  for (int i = 0; i < commands_amount; i++)
+  {
+    memset(command, 0, sizeof(command));
+    memset(command_out, 0, sizeof(command_out));
+    snprintf(command, sizeof(command), commands[i].command, commands[i].id);
 
-  pipe = popen(command, "r");
-  if (pipe == NULL)
-    return -1;
+    pipe = popen(command, "r");
+    if (pipe == NULL)
+      return -1;
 
-  while (fgets(command_out, sizeof(command_out), pipe) != NULL)
-    printf("%s\n", command_out);
+    while (fgets(command_out, sizeof(command_out), pipe) != NULL)
+      printf("%s", command_out);
 
-  pclose(pipe);
-
+    pclose(pipe);
+  }
   return 0;
 }
 
@@ -280,7 +298,7 @@ static int sema(char **args, MEM *mem)
     return -1;
 
   while (fgets(command_out, sizeof(command_out), pipe) != NULL)
-    printf("%s\n", command_out);
+    printf("%s", command_out);
 
   pclose(pipe);
 

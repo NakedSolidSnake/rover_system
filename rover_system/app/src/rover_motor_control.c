@@ -10,6 +10,7 @@
 #include <motors.h>
 #include <app.h>
 #include <semaphore/semaphore.h>
+#include <queue/queue.h>
 
 #define ROVER_MOTOR   "ROVER_MOTOR"
 
@@ -27,7 +28,7 @@ static sema_t sema = {
 
 int main()
 {
-
+  queue_st queue;
   motor_st motores;
   MEM *mem = NULL;
 
@@ -57,6 +58,9 @@ int main()
       if (semaphore_lock(&sema) == 0)
       {
         motors_action_select(motores.command, strlen(motores.command));
+        queue.queueType = 1;
+        snprintf(queue.bData, sizeof(queue.bData) ,"$:%04d:%04d:%s:FFFF:#", MOTOR_ID, (int)strlen(motores.command), motores.command);
+        queue_send(mem->queue_server_id, &queue, (int)strlen(motores.command) + 1);
         semaphore_unlock(&sema);
       }
 
