@@ -20,10 +20,12 @@ int lcd16_action_select(const char *action, int action_len)
 
     if (line == 1)
     {
+        memset(mem->status.lcd16_status.msg_line1, 0, sizeof(mem->status.lcd16_status.msg_line1));
         strncpy(mem->status.lcd16_status.msg_line1, message, strlen(message));
     }
     else if (line == 2)
     {
+        memset(mem->status.lcd16_status.msg_line2, 0, sizeof(mem->status.lcd16_status.msg_line2));
         strncpy(mem->status.lcd16_status.msg_line2, message, strlen(message));
     }
 
