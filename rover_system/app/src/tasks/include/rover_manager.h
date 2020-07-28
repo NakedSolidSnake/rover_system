@@ -3,4 +3,6 @@
 
 void *rover_manager(void *args);
 
+int manager_route(int id, const char *command);
+
 #endif

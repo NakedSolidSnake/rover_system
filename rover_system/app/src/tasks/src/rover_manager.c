@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <manager.h>
 #include <signal.h>
 #include <signal/signal.h>
 #include <log/log.h>
@@ -11,22 +10,14 @@
 
 #define ROVER_MANAGER   "ROVER_MANAGER"
 
-static int queue_id = -1;
-static  sema_t sema = {
-        .id = -1,
-        .sema_count = 1,
-        .state = LOCKED,
-        .master = SLAVE
-    };
+static Context_st manager_context;
 
-static void signal_handler(int sig){
-  if(sig == SIGTERM){
-    logger(LOGGER_INFO, ROVER_MANAGER, "Manager unlaunched");
-    exit(SIGTERM);
-  }
-}
+static void init(void);
+static void message_received(int s);
+static void update_time(int s);
+static void end_manager(int s);
 
-static void emitSignal(const char *proc_name, MEM *mem);
+static void emitSignal(const char *proc_name);
 
 #ifdef PROCESS
 int main(int argc, char const *argv[])
@@ -38,34 +29,16 @@ int main(int argc, char const *argv[])
 
 void *rover_manager(void *args)
 {
-  (void)args;
-  MEM *mem = NULL;
+  (void)args;  
   protocol_t proto;
-  queue_st queue;
   
-  signal_register(signal_handler, SIGTERM);
-
-  queue_id = queue_init(QUEUE_MANAGER_ID);
-
-  if(queue_id < 0){
-    logger(LOGGER_INFO, ROVER_MANAGER, "Queue init error.");
-    exit(EXIT_FAILURE);
-  }
-
-  semaphore_init(&sema, SEMA_ID);
-
-  mem = mem_get();
-  if(mem == NULL)
-  {
-    logger(LOGGER_INFO, ROVER_MANAGER, "Memory not initialized");
-    return NULL;
-  }
   
-  queue.queueType = 1;
+  
+  init();  
 
   while(1)
   {
-    if(queue_recv(queue_id, &queue, sizeof(queue.bData), 0) < 0){
+    if(queue_recv(manager_context.mem->queueid, &manager_context.queue, sizeof(manager_context.queue.bData), 0) < 0){
       logger(LOGGER_INFO, ROVER_MANAGER, "Queue receive error.");
       continue;
     } 
@@ -73,24 +46,23 @@ void *rover_manager(void *args)
     //convert to generic type to analise which id is.    
     memset(&proto, 0, sizeof(proto));
 
-    protocol_umount(&proto, queue.bData, sizeof(proto));
+    protocol_umount(&proto, manager_context.queue.bData, sizeof(proto));
     loggerArgs(LOGGER_INFO, ROVER_MANAGER, "Received: id: %04d size: %04d payload: %s checksum: %04d", proto.id,
                                                                                            proto.size,
                                                                                            proto.payload,
                                                                                            proto.checksum);
 
-    if(manager(proto.id, proto.payload, mem) != 0){
+    if(manager_route(proto.id, proto.payload) != 0){
       logger(LOGGER_INFO, ROVER_MANAGER, "Error type no exist.");
     }
 
-    memset(queue.bData, 0, sizeof(queue.bData));
+    memset(manager_context.queue.bData, 0, sizeof(manager_context.queue.bData));
   }
 }
 
-int manager(int id, const char *command, MEM *mem)
+int manager_route(int id, const char *command)
 {   
   char proc[PROC_NAME_MAX] = {0};
-  message_st *dev = &mem->msg;
 
   switch(id){
     case MOTOR_ID:
@@ -114,26 +86,64 @@ int manager(int id, const char *command, MEM *mem)
       return -1;
   }
 
-  if (semaphore_lock(&sema) == 0)
+  if (semaphore_lock(&manager_context.sema) == 0)
   {
-    memset(dev->command, 0, sizeof(dev->command));
-    memcpy(dev->command, command, strlen(command));
-    semaphore_unlock(&sema);
+    memset(manager_context.mem->msg.command, 0, sizeof(manager_context.mem->msg.command));
+    memcpy(manager_context.mem->msg.command, command, strlen(command));
+    semaphore_unlock(&manager_context.sema);
   }
 
-  emitSignal(proc, mem);
+  emitSignal(proc);
   return EXIT_SUCCESS;
 }
 
-static void emitSignal(const char *proc_name, MEM *mem)
+static void emitSignal(const char *proc_name)
 {
   for(int i = 0; i < PROCESS_AMOUNT; i++)
   {
-    process_st *p = &mem->processes[i];
+    process_st *p = &manager_context.mem->processes[i];
     if(!strcmp(p->name, proc_name) && p->pid != -1)
     {
       notify_process(p->pid, SIGMESSAGERECEIVED);
       break;
     }
   }
+}
+
+
+static void init(void)
+{
+  memset(&manager_context, 0, sizeof(Context_st));
+
+  manager_context.mem = mem_get();
+  if(!manager_context.mem)
+  {
+    logger(LOGGER_INFO, ROVER_MANAGER, "Memory not initialized");
+    exit(EXIT_FAILURE);
+  }
+
+  manager_context.sema.id = -1;
+  manager_context.sema.sema_count = 1;
+  manager_context.sema.state = LOCKED;
+  manager_context.sema.master = SLAVE;
+
+  semaphore_init(&manager_context.sema, SEMA_ID);
+  
+  signal_register(update_time, SIGUPDATETIME);
+  signal_register(end_manager, SIGTERM);
+
+  manager_context.queue.queueType = 1;
+
+  logger(LOGGER_INFO, ROVER_MANAGER, "MANAGER initialized");
+}
+
+static void update_time(int s)
+{
+  manager_context.states.update_time = 1;
+}
+
+void end_manager(int s)
+{
+  logger(LOGGER_INFO, ROVER_MANAGER, "MANAGER unlaunched");
+  exit(s);
 }
