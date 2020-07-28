@@ -2,16 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <manager.h>
-#include <queue/queue.h>
-#include <sharedmemory/sharedmemory.h>
-#include <rover_types.h>
 #include <signal.h>
 #include <signal/signal.h>
 #include <log/log.h>
-#include <app.h>
 #include <protocol.h>
-#include <semaphore/semaphore.h>
 #include <rover_manager.h>
+#include <context.h>
 
 #define ROVER_MANAGER   "ROVER_MANAGER"
 
@@ -136,7 +132,7 @@ static void emitSignal(const char *proc_name, MEM *mem)
     process_st *p = &mem->processes[i];
     if(!strcmp(p->name, proc_name) && p->pid != -1)
     {
-      notify_process(p->pid, SIGUSR1);
+      notify_process(p->pid, SIGMESSAGERECEIVED);
       break;
     }
   }

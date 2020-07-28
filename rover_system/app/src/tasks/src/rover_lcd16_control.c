@@ -2,31 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <rover_types.h>
 #include <log/log.h>
 #include <signal/signal.h>
 #include <signal.h>
 #include <lcd16_action.h>
 #include <lcd16.h>
-#include <app.h>
-#include <semaphore/semaphore.h>
-#include <queue/queue.h>
 #include <rover_lcd16_control.h>
+#include <context.h>
 
 #define ROVER_LCD16   "ROVER_LCD16"
 
-static int _update = 0;
+static Context_st lcd16_context;
 
-static sema_t sema = {
-        .id = -1,
-        .sema_count = 1,
-        .state = LOCKED,
-        .master = SLAVE
-    };
 
-void update(int s);
-void end_lcd16(int s);
-void segfault(int s);
+static void init(void);
+static void message_received(int s);
+static void update_time(int s);
+static void end_motor(int s);
 
 #ifdef PROCESS
 int main(int argc, char const *argv[])
@@ -40,63 +32,83 @@ int main(int argc, char const *argv[])
 void *rover_lcd16_control(void *args)
 {
   (void)args;
-  message_st lcd16;
-  MEM *mem = NULL;
-  queue_st queue;
-
-  semaphore_init(&sema, SEMA_ID);
-
-  LCD16_init();
-
-  signal_register(update, SIGUSR1);
-  signal_register(end_lcd16, SIGTERM);
-  signal_register(segfault, SIGUSR2);
-
-  mem = mem_get();
-  if(!mem)
-  {
-    logger(LOGGER_INFO, ROVER_LCD16, "Memory not initialized");
-    return 1;
-  }
-
-  logger(LOGGER_INFO, ROVER_LCD16, "LCD16 initialized");
   
+  init();
+
+   
   while(1)
   {
-    if(_update == 1){
-      memcpy(&lcd16, &mem->msg, sizeof(lcd16));
-      logger(LOGGER_INFO, ROVER_LCD16, lcd16.command);
+    if(lcd16_context.states.message_received){
+      memcpy(&lcd16_context.msg, &lcd16_context.mem->msg, sizeof(message_st));
+      logger(LOGGER_INFO, ROVER_LCD16, lcd16_context.msg.command);
       //call command here      
-      if (semaphore_lock(&sema) == 0)
+      if (semaphore_lock(&lcd16_context.sema) == 0)
       {
-        lcd16_action_select(lcd16.command, strlen(lcd16.command));
-        queue.queueType = 1;
-        snprintf(queue.bData, sizeof(queue.bData) ,"$:%04d:%04d:%s:FFFF:#", LCD16_ID, (int)strlen(mem->status.lcd16_status.msg_line1), mem->status.lcd16_status.msg_line1);        
-        queue_send(mem->queue_server_id, &queue, (int)strlen(mem->status.lcd16_status.msg_line1) + 1);
-        semaphore_unlock(&sema);
+        lcd16_action_select(lcd16_context.msg.command, strlen(lcd16_context.msg.command));
+        lcd16_context.queue.queueType = 1;
+        snprintf(lcd16_context.queue.bData, sizeof(lcd16_context.queue.bData) ,"$:%04d:%04d:%s:FFFF:#",
+                                                                              LCD16_ID,
+                                                                              (int)strlen(lcd16_context.mem->status.lcd16_status.msg_line1),
+                                                                              lcd16_context.mem->status.lcd16_status.msg_line1);        
+
+        queue_send(lcd16_context.mem->queue_server_id, &lcd16_context.queue, (int)strlen(lcd16_context.mem->status.lcd16_status.msg_line1) + 1);
+        semaphore_unlock(&lcd16_context.sema);
       }
-      _update = 0;
+      lcd16_context.states.message_received = 0;
+    } 
+
+    else if(lcd16_context.states.update_time){
+
+      lcd16_context.states.update_time = 0;
     }
     
     else{
       pause();
     }
   }
+
+  return NULL;
 }
 
-void update(int s)
+static void init(void)
 {
-  _update = 1;
+  LCD16_init();
+
+  memset(&lcd16_context, 0, sizeof(Context_st));
+
+  lcd16_context.mem = mem_get();
+  if(!lcd16_context.mem)
+  {
+    logger(LOGGER_INFO, ROVER_LCD16, "Memory not initialized");
+    exit(EXIT_FAILURE);
+  }
+
+  lcd16_context.sema.id = -1;
+  lcd16_context.sema.sema_count = 1;
+  lcd16_context.sema.state = LOCKED;
+  lcd16_context.sema.master = SLAVE;
+
+  semaphore_init(&lcd16_context.sema, SEMA_ID);
+  
+  signal_register(message_received, SIGMESSAGERECEIVED);
+  signal_register(update_time, SIGUPDATETIME);
+  signal_register(end_motor, SIGTERM);
+
+  logger(LOGGER_INFO, ROVER_LCD16, "LCD16 initialized");
 }
 
-void end_lcd16(int s)
+void message_received(int s)
+{  
+  lcd16_context.states.message_received = 1;
+}
+
+static void update_time(int s)
+{
+  lcd16_context.states.update_time = 1;
+}
+
+void end_motor(int s)
 {
   logger(LOGGER_INFO, ROVER_LCD16, "LCD16 unlaunched");
   exit(s);
-}
-
-void segfault(int s)
-{
-  int *p = 0x00;
-  *p = 5;
 }

@@ -2,30 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <rover_types.h>
 #include <log/log.h>
 #include <signal/signal.h>
 #include <signal.h>
 #include <ultrasound_action.h>
 #include <hc_sr04.h>
-#include <app.h>
-#include <semaphore/semaphore.h>
-#include <queue/queue.h>
 #include <rover_ultrasound_control.h>
+#include <context.h>
 
 #define ROVER_ULTRASOUND   "ROVER_ULTRASOUND"
 
-static int _update = 0;
+static Context_st ultrasound_context;
 
-static sema_t sema = {
-        .id = -1,
-        .sema_count = 1,
-        .state = LOCKED,
-        .master = SLAVE
-    };
-
-static void update(int s);
+static void init(void);
+static void message_received(int s);
+static void update_time(int s);
 static void end_ultrasound(int s);
+
 
 #ifdef PROCESS
 int main(int argc, char const *argv[])
@@ -38,54 +31,80 @@ int main(int argc, char const *argv[])
 void *rover_ultrasound_control(void *args)
 {
   (void)args;
-  queue_st queue;
-  message_st ultrasound;
-  MEM *mem = NULL;
-
-  HC_SR04_init();
-
-  semaphore_init(&sema, SEMA_ID);
-
-  signal_register(update, SIGUSR1);
-  signal_register(end_ultrasound, SIGTERM);
-
-  mem = mem_get();
-  if(!mem)
-  {
-    logger(LOGGER_INFO, ROVER_ULTRASOUND, "Memory not initialized");
-    return 1;
-  }
-
-  logger(LOGGER_INFO, ROVER_ULTRASOUND, "Ultrasound initialized");
+ 
+  init();
   
   while(1)
   {
-    if(_update == 1){
-      memcpy(&ultrasound, &mem->msg, sizeof(ultrasound));
-      logger(LOGGER_INFO, ROVER_ULTRASOUND, ultrasound.command);
+    if(ultrasound_context.states.message_received){
+      memcpy(&ultrasound_context.msg, &ultrasound_context.mem->msg, sizeof(message_st));
+      logger(LOGGER_INFO, ROVER_ULTRASOUND, ultrasound_context.msg.command);
       //call command here      
-      if (semaphore_lock(&sema) == 0)
+      if (semaphore_lock(&ultrasound_context.sema) == 0)
       {
-        ultrasound_action_select(ultrasound.command, strlen(ultrasound.command));
-        snprintf(queue.bData, sizeof(queue.bData) ,"$:%04d:%04d:%s:FFFF:#", ULTRASOUND_ID, (int)strlen(ultrasound.command), ultrasound.command);
-        queue_send(mem->queue_server_id, &queue, (int)strlen(ultrasound.command) + 1);
-        semaphore_unlock(&sema);
+        ultrasound_action_select(ultrasound_context.msg.command, strlen(ultrasound_context.msg.command));
+        snprintf(ultrasound_context.queue.bData, sizeof(ultrasound_context.queue.bData) ,"$:%04d:%04d:%s:FFFF:#",
+                                                                                        ULTRASOUND_ID,
+                                                                                        (int)strlen(ultrasound_context.msg.command),
+                                                                                        ultrasound_context.msg.command);
+        queue_send(ultrasound_context.mem->queue_server_id, &ultrasound_context.queue, (int)strlen(ultrasound_context.msg.command) + 1);
+        semaphore_unlock(&ultrasound_context.sema);
       }
-      _update = 0;
+      ultrasound_context.states.message_received = 0;
     } 
+
+    else if(ultrasound_context.states.update_time){
+
+      ultrasound_context.states.update_time = 0;
+    }
+
     else{
       pause();
     }
   }
+
+  return NULL;
 }
 
-static void update(int s)
+static void init(void)
 {
-  _update = 1;
+  HC_SR04_init();
+
+  memset(&ultrasound_context, 0, sizeof(Context_st));
+
+  ultrasound_context.mem = mem_get();
+  if(!ultrasound_context.mem)
+  {
+    logger(LOGGER_INFO, ROVER_ULTRASOUND, "Memory not initialized");
+    exit(EXIT_FAILURE);
+  }
+
+  ultrasound_context.sema.id = -1;
+  ultrasound_context.sema.sema_count = 1;
+  ultrasound_context.sema.state = LOCKED;
+  ultrasound_context.sema.master = SLAVE;
+
+  semaphore_init(&ultrasound_context.sema, SEMA_ID);
+  
+  signal_register(message_received, SIGMESSAGERECEIVED);
+  signal_register(update_time, SIGUPDATETIME);
+  signal_register(end_ultrasound, SIGTERM);
+
+  logger(LOGGER_INFO, ROVER_ULTRASOUND, "ULTRASOUND initialized");
 }
 
-static void end_ultrasound(int s)
+void message_received(int s)
+{  
+  ultrasound_context.states.message_received = 1;
+}
+
+static void update_time(int s)
 {
-  logger(LOGGER_INFO, ROVER_ULTRASOUND, "Ultrasound unlaunched");
+  ultrasound_context.states.update_time = 1;
+}
+
+void end_ultrasound(int s)
+{
+  logger(LOGGER_INFO, ROVER_ULTRASOUND, "ULTRASOUND unlaunched");
   exit(s);
 }

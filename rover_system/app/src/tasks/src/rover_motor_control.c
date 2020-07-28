@@ -2,30 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <rover_types.h>
 #include <log/log.h>
 #include <signal/signal.h>
 #include <signal.h>
 #include <motors_action.h>
 #include <motors.h>
-#include <app.h>
-#include <semaphore/semaphore.h>
-#include <queue/queue.h>
 #include <rover_motor_control.h>
+#include <context.h>
 
 #define ROVER_MOTOR   "ROVER_MOTOR"
 
-static int _update = 0;
+static Context_st motor_context;
 
-static void update(int s);
+static void init(void);
+static void message_received(int s);
+static void update_time(int s);
 static void end_motor(int s);
 
-static sema_t sema = {
-        .id = -1,
-        .sema_count = 1,
-        .state = LOCKED,
-        .master = SLAVE
-    };
 
 #ifdef PROCESS
 int main(int argc, char const *argv[])
@@ -38,57 +31,83 @@ int main(int argc, char const *argv[])
 void *rover_motor_control(void *args)
 {
   (void)args;
-  queue_st queue;
-  message_st motores;
-  MEM *mem = NULL;
 
-  MOTORS_init();
-
-  semaphore_init(&sema, SEMA_ID);
-
-  signal_register(update, SIGUSR1);
-  signal_register(end_motor, SIGTERM);
-
-  mem = mem_get();
-  if(!mem)
-  {
-    logger(LOGGER_INFO, ROVER_MOTOR, "Memory not initialized");
-    return 1;
-  }
-
-  logger(LOGGER_INFO, ROVER_MOTOR, "Motor initialized");
+  init();
   
   while(1)
   {
-    if (_update == 1)
+    if (motor_context.states.message_received)
     {
-      memcpy(&motores, &mem->msg, sizeof(motores));
-      logger(LOGGER_INFO, ROVER_MOTOR, motores.command);
+      memcpy(&motor_context.msg, &motor_context.mem->msg, sizeof(message_st));
+      logger(LOGGER_INFO, ROVER_MOTOR, motor_context.msg.command);
       //call command here
-      if (semaphore_lock(&sema) == 0)
+      if (semaphore_lock(&motor_context.sema) == 0)
       {
-        motors_action_select(motores.command, strlen(motores.command));
-        queue.queueType = 1;
-        snprintf(queue.bData, sizeof(queue.bData) ,"$:%04d:%04d:%s:FFFF:#", MOTOR_ID, (int)strlen(motores.command), motores.command);
-        queue_send(mem->queue_server_id, &queue, (int)strlen(motores.command) + 1);
-        semaphore_unlock(&sema);
+        motors_action_select(motor_context.msg.command, strlen(motor_context.msg.command));
+        motor_context.queue.queueType = 1;
+        snprintf(motor_context.queue.bData, sizeof(motor_context.queue.bData) ,"$:%04d:%04d:%s:FFFF:#",
+                                                                               MOTOR_ID,
+                                                                               (int)strlen(motor_context.msg.command),
+                                                                               motor_context.msg.command);
+        queue_send(motor_context.mem->queue_server_id, &motor_context.queue, (int)strlen(motor_context.msg.command) + 1);
+        semaphore_unlock(&motor_context.sema);
       }
 
-      _update = 0;
+      motor_context.states.message_received = 0;
     }
+
+    else if(motor_context.states.update_time){
+
+      motor_context.states.update_time = 0;
+    }
+
     else{
       pause();
     }
   }
+
+  return NULL;
 }
 
-static void update(int s)
+static void init(void)
 {
-  _update = 1;
+  MOTORS_init();
+
+  memset(&motor_context, 0, sizeof(Context_st));
+
+  motor_context.mem = mem_get();
+  if(!motor_context.mem)
+  {
+    logger(LOGGER_INFO, ROVER_MOTOR, "Memory not initialized");
+    exit(EXIT_FAILURE);
+  }
+
+  motor_context.sema.id = -1;
+  motor_context.sema.sema_count = 1;
+  motor_context.sema.state = LOCKED;
+  motor_context.sema.master = SLAVE;
+
+  semaphore_init(&motor_context.sema, SEMA_ID);
+  
+  signal_register(message_received, SIGMESSAGERECEIVED);
+  signal_register(update_time, SIGUPDATETIME);
+  signal_register(end_motor, SIGTERM);
+
+  logger(LOGGER_INFO, ROVER_MOTOR, "MOTORS initialized");
 }
 
-static void end_motor(int s)
+void message_received(int s)
+{  
+  motor_context.states.message_received = 1;
+}
+
+static void update_time(int s)
 {
-  logger(LOGGER_INFO, ROVER_MOTOR, "Motor unlaunched");
+  motor_context.states.update_time = 1;
+}
+
+void end_motor(int s)
+{
+  logger(LOGGER_INFO, ROVER_MOTOR, "MOTORS unlaunched");
   exit(s);
 }
