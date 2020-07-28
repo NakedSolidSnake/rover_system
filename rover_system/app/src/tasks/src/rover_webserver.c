@@ -8,6 +8,7 @@
 #include <signal/signal.h>
 #include <signal.h>
 #include <unistd.h>
+#include <rover_webserver.h>
 
 #define ROVER_WEBSERVER "ROVER_WEBSERVER"
 
@@ -27,19 +28,25 @@ typedef struct
 
 static int sender(char *buffer, int *size);
 static int receive(char *buffer, int size);
-
 static int sendPage(char *buffer, int *size);
-
-void end_server(int s);
+static void end_server(int s);
 
 static method_t methods[] =
     {
         {.method = "GET", .size = 3, .call_method = sendPage, .set = 0},
 };
 
-// Driver function
-int main()
+#ifdef PROCESS
+int main(int argc, char const *argv[])
 {
+    (void)rover_webserver(NULL);
+    return 0;
+}
+#endif
+
+void *rover_webserver(void *args)
+{
+  (void)args;
   Server_t server =
       {
           .socket = -1,
@@ -53,7 +60,7 @@ int main()
   Server_exec(&server);
 }
 
-void end_server(int s)
+static void end_server(int s)
 {
   logger(LOGGER_INFO, ROVER_WEBSERVER, "Server unlaunched.");
   exit(s);

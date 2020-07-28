@@ -11,6 +11,7 @@
 #include <app.h>
 #include <protocol.h>
 #include <semaphore/semaphore.h>
+#include <rover_manager.h>
 
 #define ROVER_MANAGER   "ROVER_MANAGER"
 
@@ -31,9 +32,18 @@ static void signal_handler(int sig){
 
 static void emitSignal(const char *proc_name, MEM *mem);
 
-int main()
-{  
-  MEM *mem = NULL;
+#ifdef PROCESS
+int main(int argc, char const *argv[])
+{
+    (void)rover_manager(NULL);
+    return 0;
+}
+#endif
+
+void *rover_manager(void *args)
+{
+  (void)args;
+   MEM *mem = NULL;
   protocol_t proto;
   queue_st queue;
   

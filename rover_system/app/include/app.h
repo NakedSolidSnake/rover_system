@@ -32,6 +32,16 @@
 #define ROVER_PROCESS_MQTT          "/home/cssouza/rover/bin/rover_mqtt"
 #define ROVER_PROCESS_WEBSERVER     "/home/cssouza/rover/bin/rover_webserver"
 
+// TODO test with systemd setting path to dir where the binaries are
+// #define ROVER_PROCESS_SERVER        "rover_server"
+// #define ROVER_PROCESS_MOTOR         "rover_motor_control"
+// #define ROVER_PROCESS_SERVO         "rover_servo_control"
+// #define ROVER_PROCESS_ULTRASOUND    "rover_ultrasound_control"
+// #define ROVER_PROCESS_LCD16         "rover_lcd16_control"
+// #define ROVER_PROCESS_MANAGER       "rover_manager"
+// #define ROVER_PROCESS_MQTT          "rover_mqtt"
+// #define ROVER_PROCESS_WEBSERVER     "rover_webserver"
+
 //Process amount
 #define PROCESS_AMOUNT 8
 
@@ -70,8 +80,12 @@ typedef enum TYPE{
 }TYPE_e;
 
 
-int mem_init(MEM *mem);
+int mem_init(void);
+int mem_denit(void);
 MEM *mem_get(void);
-int mem_set(MEM *mem);
+int memoryWrite(MEM * mem, void *data, int offset);
+
+int ipc_init(void);
+int ipc_denit(void);
 
 #endif

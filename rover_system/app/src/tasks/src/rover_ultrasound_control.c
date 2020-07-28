@@ -11,6 +11,7 @@
 #include <app.h>
 #include <semaphore/semaphore.h>
 #include <queue/queue.h>
+#include <rover_ultrasound_control.h>
 
 #define ROVER_ULTRASOUND   "ROVER_ULTRASOUND"
 
@@ -23,12 +24,20 @@ static sema_t sema = {
         .master = SLAVE
     };
 
-void update(int s);
-void end_ultrasound(int s);
+static void update(int s);
+static void end_ultrasound(int s);
 
-
-int main()
+#ifdef PROCESS
+int main(int argc, char const *argv[])
 {
+    (void)rover_ultrasound_control(NULL);
+    return 0;
+}
+#endif
+
+void *rover_ultrasound_control(void *args)
+{
+  (void)args;
   queue_st queue;
   ultrasound_st ultrasound;
   MEM *mem = NULL;
@@ -70,12 +79,12 @@ int main()
   }
 }
 
-void update(int s)
+static void update(int s)
 {
   _update = 1;
 }
 
-void end_ultrasound(int s)
+static void end_ultrasound(int s)
 {
   logger(LOGGER_INFO, ROVER_ULTRASOUND, "Ultrasound unlaunched");
   exit(s);

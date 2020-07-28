@@ -9,6 +9,7 @@
 #include <signal/signal.h>
 #include <signal.h>
 #include <unistd.h>
+#include <rover_server.h>
 
 #define ROVER_SERVER "ROVER_SERVER"
 
@@ -21,10 +22,18 @@ static int queue_id = -1;
 static int queue_server_id = -1;
 static queue_st queue;
 
-// Driver function
-int main()
+#ifdef PROCESS
+int main(int argc, char const *argv[])
 {
-  Server_t server =
+    (void)rover_server(NULL);
+    return 0;
+}
+#endif
+
+void *rover_server(void *args)
+{
+  (void)args;
+   Server_t server =
       {
           .socket = -1,
           .port = "8080",

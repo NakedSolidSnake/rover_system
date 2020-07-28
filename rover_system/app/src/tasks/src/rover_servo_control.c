@@ -11,6 +11,7 @@
 #include <app.h>
 #include <semaphore/semaphore.h>
 #include <queue/queue.h>
+#include <rover_servo_control.h>
 
 #define ROVER_SERVO "ROVER_SERVO"
 
@@ -24,13 +25,21 @@ static sema_t sema = {
     };
 
 
-void update(int s);
-void end_servo(int s);
+static void update(int s);
+static void end_servo(int s);
 
-int main()
+#ifdef PROCESS
+int main(int argc, char const *argv[])
 {
+    (void)rover_servo_control(NULL);
+    return 0;
+}
+#endif
 
-  queue_st queue;
+void *rover_servo_control(void *args)
+{
+  (void)args;
+   queue_st queue;
   servo_st servo;
   MEM *mem = NULL;
 
@@ -75,12 +84,12 @@ int main()
   }
 }
 
-void update(int s)
+static void update(int s)
 {
   _update = 1;
 }
 
-void end_servo(int s)
+static void end_servo(int s)
 {
   logger(LOGGER_INFO, ROVER_SERVO, "Servo Unlaunched");
   exit(s);

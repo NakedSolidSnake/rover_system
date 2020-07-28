@@ -9,6 +9,17 @@
         "motors_action.h": "c",
         "stdio.h": "c",
         "servo_action.h": "c",
-        "unordered_map": "c"
+        "unordered_map": "c",
+        "time.h": "c",
+        "hc_sr04.h": "c",
+        "semaphore.h": "c",
+        "rover_status.h": "c",
+        "rover_manager.h": "c",
+        "rover_motor_control.h": "c",
+        "rover_mqtt.h": "c",
+        "rover_server.h": "c",
+        "rover_servo_control.h": "c",
+        "rover_ultrasound_control.h": "c",
+        "rover_webserver.h": "c"
     }
 }

@@ -11,13 +11,14 @@
 #include <app.h>
 #include <semaphore/semaphore.h>
 #include <queue/queue.h>
+#include <rover_motor_control.h>
 
 #define ROVER_MOTOR   "ROVER_MOTOR"
 
 static int _update = 0;
 
-void update(int s);
-void end_motor(int s);
+static void update(int s);
+static void end_motor(int s);
 
 static sema_t sema = {
         .id = -1,
@@ -26,8 +27,17 @@ static sema_t sema = {
         .master = SLAVE
     };
 
-int main()
+#ifdef PROCESS
+int main(int argc, char const *argv[])
 {
+    (void)rover_motor_control(NULL);
+    return 0;
+}
+#endif
+
+void *rover_motor_control(void *args)
+{
+  (void)args;
   queue_st queue;
   motor_st motores;
   MEM *mem = NULL;
@@ -72,12 +82,12 @@ int main()
   }
 }
 
-void update(int s)
+static void update(int s)
 {
   _update = 1;
 }
 
-void end_motor(int s)
+static void end_motor(int s)
 {
   logger(LOGGER_INFO, ROVER_MOTOR, "Motor unlaunched");
   exit(s);

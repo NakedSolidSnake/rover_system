@@ -11,6 +11,7 @@
 #include <app.h>
 #include <semaphore/semaphore.h>
 #include <queue/queue.h>
+#include <rover_lcd16_control.h>
 
 #define ROVER_LCD16   "ROVER_LCD16"
 
@@ -25,11 +26,20 @@ static sema_t sema = {
 
 void update(int s);
 void end_lcd16(int s);
+void segfault(int s);
 
-
-int main()
+#ifdef PROCESS
+int main(int argc, char const *argv[])
 {
+    (void)rover_lcd16_control(NULL);
+    return 0;
+}
+#endif
 
+
+void *rover_lcd16_control(void *args)
+{
+  (void)args;
   lcd16_st lcd16;
   MEM *mem = NULL;
   queue_st queue;
@@ -40,6 +50,7 @@ int main()
 
   signal_register(update, SIGUSR1);
   signal_register(end_lcd16, SIGTERM);
+  signal_register(segfault, SIGUSR2);
 
   mem = mem_get();
   if(!mem)
@@ -65,7 +76,8 @@ int main()
         semaphore_unlock(&sema);
       }
       _update = 0;
-    } 
+    }
+    
     else{
       pause();
     }
@@ -81,4 +93,10 @@ void end_lcd16(int s)
 {
   logger(LOGGER_INFO, ROVER_LCD16, "LCD16 unlaunched");
   exit(s);
+}
+
+void segfault(int s)
+{
+  int *p = 0x00;
+  *p = 5;
 }
