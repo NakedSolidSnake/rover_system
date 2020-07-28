@@ -43,7 +43,7 @@ int main(int argc, char const *argv[])
 void *rover_manager(void *args)
 {
   (void)args;
-   MEM *mem = NULL;
+  MEM *mem = NULL;
   protocol_t proto;
   queue_st queue;
   
@@ -62,7 +62,7 @@ void *rover_manager(void *args)
   if(mem == NULL)
   {
     logger(LOGGER_INFO, ROVER_MANAGER, "Memory not initialized");
-    return 1;
+    return NULL;
   }
   
   queue.queueType = 1;
@@ -94,26 +94,22 @@ void *rover_manager(void *args)
 int manager(int id, const char *command, MEM *mem)
 {   
   char proc[PROC_NAME_MAX] = {0};
-  generic_st *dev = NULL;
+  message_st *dev = &mem->msg;
 
   switch(id){
     case MOTOR_ID:
-      dev = &mem->motor;
-      strncpy(proc, ROVER_PROCESS_MOTOR, strlen(ROVER_PROCESS_MOTOR));
+        strncpy(proc, ROVER_PROCESS_MOTOR, strlen(ROVER_PROCESS_MOTOR));
       break;
 
     case SERVO_ID:
-      dev = &mem->servo;
       strncpy(proc, ROVER_PROCESS_SERVO, strlen(ROVER_PROCESS_SERVO));
       break;
 
     case ULTRASOUND_ID:
-      dev = &mem->ultrasound;
       strncpy(proc, ROVER_PROCESS_ULTRASOUND, strlen(ROVER_PROCESS_ULTRASOUND));
       break;
 
     case LCD16_ID:
-      dev = &mem->lcd16;
       strncpy(proc, ROVER_PROCESS_LCD16, strlen(ROVER_PROCESS_LCD16));
       break;
       
@@ -137,7 +133,7 @@ static void emitSignal(const char *proc_name, MEM *mem)
 {
   for(int i = 0; i < PROCESS_AMOUNT; i++)
   {
-    process_t *p = &mem->procs[i];
+    process_st *p = &mem->processes[i];
     if(!strcmp(p->name, proc_name) && p->pid != -1)
     {
       notify_process(p->pid, SIGUSR1);

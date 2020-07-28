@@ -170,8 +170,8 @@ static int process(char **args, MEM *mem)
 
   for (int i = 0; i < PROCESS_AMOUNT; i++)
   {
-    process_t *proc = &mem->procs[i];
-    printf("process[%d]: %s %s\n", proc->pid, proc->name, isRunning(proc->pid));
+    process_st *process = &mem->processes[i];
+    printf("process[%d]: %s %s\n", process->pid, process->name, isRunning(process->pid));
   }
 
   return 0;

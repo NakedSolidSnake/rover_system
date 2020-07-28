@@ -40,7 +40,7 @@ void *rover_servo_control(void *args)
 {
   (void)args;
    queue_st queue;
-  servo_st servo;
+  message_st servo;
   MEM *mem = NULL;
 
   SERVO_init();
@@ -63,7 +63,7 @@ void *rover_servo_control(void *args)
   {
     if(_update == 1)
     {
-      memcpy(&servo, &mem->servo, sizeof(servo));
+      memcpy(&servo, &mem->msg, sizeof(servo));
       logger(LOGGER_INFO, ROVER_SERVO, servo.command);
       //call command here
       

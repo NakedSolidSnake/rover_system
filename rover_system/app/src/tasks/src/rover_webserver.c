@@ -107,11 +107,7 @@ static int sendPage(char *buffer, int *size)
   {
     return 1;
   }
-
-  generic_st *m = &mem->motor;
-  generic_st *s = &mem->servo;
-
-
+  
   char b[512];
 
   char msg[] =
@@ -125,14 +121,21 @@ static int sendPage(char *buffer, int *size)
         "</title>"
 
         "<main>"
-            "<p>Motors: status %s</p>"
-            "<p>Servo: status %s</p>"
+            "<p>Motors: [ direction : %d ] [Power : %d]</p>"
+            "<p>Servo: [Position : %d]</p>"
+            "<p>Ultrasound: [Distance : %f]</p>"
+            "<p>LCD: [Line 1 : %s] [Line 2: %s]</p>"
             "</h2>"
         "</main>"
     "</body>"
 "</html>";
 
-  snprintf(b, sizeof(b), msg, m->command, s->command);
+  snprintf(b, sizeof(b), msg, mem->status.motor_status.direction,
+                              mem->status.motor_status.power,
+                              mem->status.servo_status.position,
+                              mem->status.ultrasound_status.distance,
+                              mem->status.lcd16_status.msg_line1,
+                              mem->status.lcd16_status.msg_line2);
 
   memset(buffer, 0, MAX_BUFFER_SEND_RECV);
   

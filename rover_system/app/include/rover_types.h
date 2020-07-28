@@ -1,31 +1,11 @@
 #ifndef __ROVER_TYPES_H
 #define __ROVER_TYPES_H 
 
-typedef struct motor{
+typedef struct message{
   int id;
   int status;
   char command[64];
-}motor_st;
+}message_st;
 
-typedef struct servo{
-  int id;
-  int status;
-  char command[64];
-}servo_st;
-
-typedef struct ultrasound{
-  int id;
-  int status;
-  char command[64];
-}ultrasound_st;
-
-typedef struct lcd16{
-  int id;
-  int status;
-  char command[64];
-}lcd16_st;
-
-#define MOTOR_OFFSET      0
-#define SERVO_OFFSET      (MOTOR_OFFSET + sizeof(motor_st))
 
 #endif

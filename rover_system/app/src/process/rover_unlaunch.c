@@ -22,18 +22,16 @@ int main()
     return 1;
   }
 
-  for(int i = 0; i < PROCESS_AMOUNT; i++)
+  for(int i = 0; i < mem->process_amount; i++)
   {
      
-    if(mem->procs[i].pid != -1)
-      notify_process(mem->procs[i].pid, SIGTERM);
+    if(mem->processes[i].pid != -1)
+      notify_process(mem->processes[i].pid, SIGTERM);
   }
 
   queue_destroy(mem->queueid);  
   queue_destroy(mem->queue_server_id);
-
   sharedMemoryDestroy(&mem->shm);
-
   semaphore_destroy(&mem->sema);
 
   return EXIT_SUCCESS;

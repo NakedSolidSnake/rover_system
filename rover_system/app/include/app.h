@@ -4,6 +4,8 @@
 #include <sharedmemory/sharedmemory.h>
 #include <semaphore/semaphore.h>
 #include <rover_status.h>
+#include <rover_types.h>
+#include <time.h>
 
 #define PROC_NAME_MAX     80
 
@@ -31,16 +33,7 @@
 #define ROVER_PROCESS_MANAGER       "/home/cssouza/rover/bin/rover_manager"
 #define ROVER_PROCESS_MQTT          "/home/cssouza/rover/bin/rover_mqtt"
 #define ROVER_PROCESS_WEBSERVER     "/home/cssouza/rover/bin/rover_webserver"
-
-// TODO test with systemd setting path to dir where the binaries are
-// #define ROVER_PROCESS_SERVER        "rover_server"
-// #define ROVER_PROCESS_MOTOR         "rover_motor_control"
-// #define ROVER_PROCESS_SERVO         "rover_servo_control"
-// #define ROVER_PROCESS_ULTRASOUND    "rover_ultrasound_control"
-// #define ROVER_PROCESS_LCD16         "rover_lcd16_control"
-// #define ROVER_PROCESS_MANAGER       "rover_manager"
-// #define ROVER_PROCESS_MQTT          "rover_mqtt"
-// #define ROVER_PROCESS_WEBSERVER     "rover_webserver"
+#define ROVER_PROCESS_MONITOR       "/home/cssouza/rover/bin/rover_monitor"
 
 //Process amount
 #define PROCESS_AMOUNT 8
@@ -49,27 +42,23 @@ typedef struct process
 {
   int pid;
   char name[PROC_NAME_MAX];
-}process_t;
+  time_t update;
+  time_t old; 
+  int miss_count;
 
-typedef struct generic{
-  int id;
-  int status;
-  char command[64];
-}generic_st;
+}process_st;
 
 typedef struct MEM
 {
   int init;
-  process_t procs[PROCESS_AMOUNT];
+  process_st processes[PROCESS_AMOUNT];
   shm_t shm;
   int queueid;
   int queue_server_id;
   sema_t sema;
-  generic_st motor;
-  generic_st servo;
-  generic_st ultrasound;
-  generic_st lcd16;
-  Status_st status;  
+  message_st msg;
+  Status_st status; 
+  int process_amount; 
 }MEM;
 
 typedef enum TYPE{

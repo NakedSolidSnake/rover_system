@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 void *rover_lcd16_control(void *args)
 {
   (void)args;
-  lcd16_st lcd16;
+  message_st lcd16;
   MEM *mem = NULL;
   queue_st queue;
 
@@ -64,7 +64,7 @@ void *rover_lcd16_control(void *args)
   while(1)
   {
     if(_update == 1){
-      memcpy(&lcd16, &mem->lcd16, sizeof(lcd16));
+      memcpy(&lcd16, &mem->msg, sizeof(lcd16));
       logger(LOGGER_INFO, ROVER_LCD16, lcd16.command);
       //call command here      
       if (semaphore_lock(&sema) == 0)

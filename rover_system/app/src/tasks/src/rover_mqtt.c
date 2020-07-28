@@ -93,8 +93,6 @@ void *rover_mqtt(void *args)
   for (; loop != 1;)
   {
     //send temperature measurement
-    generic_st *m = &mem->motor;
-    generic_st *s = &mem->servo;
 
     // publishMotor(client, m->command);
     publishMotor(client, mem);

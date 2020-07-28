@@ -39,7 +39,7 @@ void *rover_motor_control(void *args)
 {
   (void)args;
   queue_st queue;
-  motor_st motores;
+  message_st motores;
   MEM *mem = NULL;
 
   MOTORS_init();
@@ -62,7 +62,7 @@ void *rover_motor_control(void *args)
   {
     if (_update == 1)
     {
-      memcpy(&motores, &mem->motor, sizeof(motores));
+      memcpy(&motores, &mem->msg, sizeof(motores));
       logger(LOGGER_INFO, ROVER_MOTOR, motores.command);
       //call command here
       if (semaphore_lock(&sema) == 0)

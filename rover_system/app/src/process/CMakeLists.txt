@@ -1,8 +1,6 @@
 add_definitions(-DPROCESS)
   
-#------------------------------------------------------------------------------------------------------
 #rover_server 
-#------------------------------------------------------------------------------------------------------
 add_executable(rover_server "")
 target_link_libraries(rover_server PUBLIC  ipc app comm)
 target_sources(rover_server
@@ -15,9 +13,7 @@ target_include_directories(rover_server
   )
 install(TARGETS rover_server DESTINATION bin)
 
-#------------------------------------------------------------------------------------------------------
 #rover_manager
-#------------------------------------------------------------------------------------------------------
 add_executable(rover_manager "")
 target_link_libraries(rover_manager PUBLIC ipc app)
 target_sources(rover_manager
@@ -30,9 +26,7 @@ target_include_directories(rover_manager
   )
 install(TARGETS rover_manager DESTINATION bin)
 
-#------------------------------------------------------------------------------------------------------
 #rover_motor_control
-#------------------------------------------------------------------------------------------------------
 add_executable(rover_motor_control "")
 target_link_libraries(rover_motor_control PUBLIC ipc drivers app)
 target_sources(rover_motor_control
@@ -101,9 +95,7 @@ target_include_directories(rover_launch
   )
 install(TARGETS rover_launch DESTINATION bin)
 
-#------------------------------------------------------------------------------------------------------
 #rover_unlaunch
-#------------------------------------------------------------------------------------------------------
 add_executable(rover_unlaunch "")
 target_link_libraries(rover_unlaunch PUBLIC ipc app)
 target_sources(rover_unlaunch
@@ -131,9 +123,7 @@ target_include_directories(rover_mqtt
 install(TARGETS rover_mqtt DESTINATION bin)
 
 
-#------------------------------------------------------------------------------------------------------
 # rover_webserver 
-#------------------------------------------------------------------------------------------------------
 add_executable(rover_webserver "")
 target_link_libraries(rover_webserver PUBLIC  ipc app comm)
 target_sources(rover_webserver
@@ -145,3 +135,16 @@ target_include_directories(rover_webserver
   ${CMAKE_CURRENT_LIST_DIR}/../tasks/include  
   )
 install(TARGETS rover_webserver DESTINATION bin)
+
+# rover_monitor
+add_executable(rover_monitor "")
+target_link_libraries(rover_monitor PUBLIC ipc app)
+target_sources(rover_monitor
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/../tasks/src/rover_monitor.c
+  )
+target_include_directories(rover_monitor 
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/../tasks/include  
+  )
+install(TARGETS rover_monitor DESTINATION bin)

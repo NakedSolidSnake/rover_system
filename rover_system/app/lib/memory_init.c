@@ -22,7 +22,8 @@ int mem_init(void)
   mem = (MEM *)shm.shm;
 
   mem->init = 1;
-  memcpy(&mem->shm, &shm.shm, sizeof(shm_t));  
+  mem->shm.id = shm.id;
+  mem->shm.shm = shm.shm;  
 
   return EXIT_SUCCESS;
 }
@@ -116,13 +117,6 @@ int mem_denit(void)
     return 1;
   }
 
-  // for(int i = 0; i < PROCESS_AMOUNT; i++)
-  // {
-     
-  //   if(mem->procs[i].pid != -1)
-  //     notify_process(mem->procs[i].pid, SIGTERM);
-  // }
-
   queue_destroy(mem->queueid);  
   queue_destroy(mem->queue_server_id);
   sharedMemoryDestroy(&mem->shm);
@@ -131,11 +125,11 @@ int mem_denit(void)
 
 int memoryWrite(MEM * mem, void *data, int offset)
 {    
-    process_t *pData = (process_t *)data;
+    process_st *pData = (process_st *)data;
     if(!data || !mem)
         return -1;
    
-    memcpy(&mem->procs[offset], pData, sizeof(process_t));
+    memcpy(&mem->processes[offset], pData, sizeof(process_st));
 
     return 0;
 }

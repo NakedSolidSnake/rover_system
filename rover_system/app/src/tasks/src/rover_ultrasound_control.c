@@ -39,7 +39,7 @@ void *rover_ultrasound_control(void *args)
 {
   (void)args;
   queue_st queue;
-  ultrasound_st ultrasound;
+  message_st ultrasound;
   MEM *mem = NULL;
 
   HC_SR04_init();
@@ -61,7 +61,7 @@ void *rover_ultrasound_control(void *args)
   while(1)
   {
     if(_update == 1){
-      memcpy(&ultrasound, &mem->ultrasound, sizeof(ultrasound));
+      memcpy(&ultrasound, &mem->msg, sizeof(ultrasound));
       logger(LOGGER_INFO, ROVER_ULTRASOUND, ultrasound.command);
       //call command here      
       if (semaphore_lock(&sema) == 0)
