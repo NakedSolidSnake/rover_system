@@ -47,7 +47,7 @@ void *rover_lcd16_control(void *args)
                                                                               (int)strlen(lcd16_context.mem->status.lcd16_status.msg_line1),
                                                                               lcd16_context.mem->status.lcd16_status.msg_line1);        
 
-        queue_send(lcd16_context.mem->queue_server_id, &lcd16_context.queue, (int)strlen(lcd16_context.mem->status.lcd16_status.msg_line1) + 1);
+        queue_send(lcd16_context.mem->queue_server_id, &lcd16_context.queue, (int)strlen(lcd16_context.queue.bData) + 1);
         semaphore_unlock(&lcd16_context.sema);
       }
       lcd16_context.states.message_received = 0;

@@ -45,7 +45,10 @@ void *rover_motor_control(void *args)
                                                                                MOTOR_ID,
                                                                                (int)strlen(motor_context.msg.command),
                                                                                motor_context.msg.command);
-        queue_send(motor_context.mem->queue_server_id, &motor_context.queue, (int)strlen(motor_context.msg.command) + 1);
+
+        loggerArgs(LOGGER_INFO, ROVER_MOTOR, "MOTOR send: %s", motor_context.queue.bData);
+
+        queue_send(motor_context.mem->queue_server_id, &motor_context.queue, (int)strlen(motor_context.queue.bData) + 1);
         semaphore_unlock(&motor_context.sema);
       }
 

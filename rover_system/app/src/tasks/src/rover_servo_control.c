@@ -48,7 +48,7 @@ void *rover_servo_control(void *args)
                                                                                SERVO_ID,
                                                                                (int)strlen(servo_context.msg.command),
                                                                                servo_context.msg.command);
-        queue_send(servo_context.mem->queue_server_id, &servo_context.queue, (int)strlen(servo_context.msg.command) + 1);
+        queue_send(servo_context.mem->queue_server_id, &servo_context.queue, (int)strlen(servo_context.queue.bData) + 1);
         semaphore_unlock(&servo_context.sema);
       }
       servo_context.states.message_received = 0;

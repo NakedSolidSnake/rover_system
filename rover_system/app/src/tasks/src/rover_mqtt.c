@@ -115,30 +115,6 @@ static void publishMotor(MQTTClient client, MEM *mem)
   publish(client, ROVER_MOTOR_POWER_TOPIC, (char *)data);
 }
 
-// static void publishMotor(MQTTClient client, const char *command)
-// {
-//   char action[10] = {0};
-//   char data[10] = {0};
-//   char *p = NULL;
-
-//   sscanf(command, "%s", action);
-
-//   if (!strncmp(command, "move", strlen("move")))
-//   {
-//     p = (char *)(command + strlen(action) + 1); //points to next string
-//     strncpy(data, p, 10);
-//     //call functions
-//     publishMotorDirection(client, p);
-//   }
-//   else if (!strncmp(command, "power", strlen("power")))
-//   {
-//     p = (char *)(command + strlen(action) + 1); //points to next string
-//     strncpy(data, p, 10);
-//     //call function
-//     publishMotorPower(client, data);
-//   }
-// }
-
 static void publishMotorPower(MQTTClient client, const char *command)
 {
   publish(client, ROVER_MOTOR_POWER_TOPIC, (char *)command);
@@ -149,22 +125,9 @@ static void publishMotorDirection(MQTTClient client, const char *command)
   publish(client, ROVER_MOTOR_DIR_TOPIC, (char *)command);
 }
 
-// static void publishServo(MQTTClient client, const char *command)
 static void publishServo(MQTTClient client, MEM *mem)
 {
   char action[10] = {0};
-  // char data[10] = {0};
-  // char *p = NULL;
-
-  // sscanf(command, "%s", action);
-
-  // if (!strncmp(command, "graus", strlen("graus")))
-  // {
-  //   p = (char *)(command + strlen(action) + 1); //points to next string
-  //   strncpy(data, p, 10);
-  //   //call functions
-  //   publicServoPosition(client, p);
-  // }
   char data[10] = {0};
   snprintf(data, 10, "%d", mem->status.servo_status.position);
   publish(client, ROVER_SERVO_TOPIC, (char *)data);

@@ -43,7 +43,7 @@ void *rover_ultrasound_control(void *args)
                                                                                         ULTRASOUND_ID,
                                                                                         (int)strlen(ultrasound_context.msg.command),
                                                                                         ultrasound_context.msg.command);
-        queue_send(ultrasound_context.mem->queue_server_id, &ultrasound_context.queue, (int)strlen(ultrasound_context.msg.command) + 1);
+        queue_send(ultrasound_context.mem->queue_server_id, &ultrasound_context.queue, (int)strlen(ultrasound_context.queue.bData) + 1);
         semaphore_unlock(&ultrasound_context.sema);
       }
       ultrasound_context.states.message_received = 0;
