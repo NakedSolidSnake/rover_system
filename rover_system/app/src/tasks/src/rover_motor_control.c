@@ -1,10 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <includes.h>
 #include <log/log.h>
 #include <signal/signal.h>
-#include <signal.h>
 #include <motors_action.h>
 #include <motors.h>
 #include <rover_motor_control.h>

@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
+#include <includes.h>
 #include <signal/signal.h>
 #include <log/log.h>
 #include <protocol.h>

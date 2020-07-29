@@ -1,9 +1,6 @@
+#include <includes.h>
 #include <rover_monitor.h>
 #include <app.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <sys/types.h>
 
 #define ROVER_MONITOR  "ROVER_MONITOR"

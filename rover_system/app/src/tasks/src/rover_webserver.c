@@ -1,13 +1,9 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include <includes.h>
 #include <log/log.h>
 #include <server/server_tcp.h>
 #include <sharedmemory/sharedmemory.h>
 #include <app.h>
 #include <signal/signal.h>
-#include <signal.h>
-#include <unistd.h>
 #include <rover_webserver.h>
 
 #define ROVER_WEBSERVER "ROVER_WEBSERVER"

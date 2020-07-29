@@ -1,10 +1,7 @@
-#include "stdlib.h"
-#include "string.h"
-#include "unistd.h"
+#include <includes.h>
 #include "MQTTClient.h"
 #include <log/log.h>
 #include <signal/signal.h>
-#include <signal.h>
 #include <sharedmemory/sharedmemory.h>
 #include <app.h>
 #include <rover_mqtt.h>

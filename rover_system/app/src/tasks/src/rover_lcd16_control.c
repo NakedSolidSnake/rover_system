@@ -1,10 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <includes.h>
 #include <log/log.h>
 #include <signal/signal.h>
-#include <signal.h>
 #include <lcd16_action.h>
 #include <lcd16.h>
 #include <rover_lcd16_control.h>

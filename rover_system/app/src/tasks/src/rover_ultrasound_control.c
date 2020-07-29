@@ -1,10 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <includes.h>
 #include <log/log.h>
 #include <signal/signal.h>
-#include <signal.h>
 #include <ultrasound_action.h>
 #include <hc_sr04.h>
 #include <rover_ultrasound_control.h>

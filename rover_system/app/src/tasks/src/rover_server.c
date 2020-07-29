@@ -1,14 +1,10 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include <includes.h>
 #include <queue/queue.h>
 #include <log/log.h>
 #include <server/server_tcp.h>
 #include <app.h>
 #include <protocol.h>
 #include <signal/signal.h>
-#include <signal.h>
-#include <unistd.h>
 #include <rover_server.h>
 
 #define ROVER_SERVER "ROVER_SERVER"
