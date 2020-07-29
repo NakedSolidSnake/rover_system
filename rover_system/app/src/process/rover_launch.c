@@ -32,7 +32,7 @@ static processList_st pList[] =
         {.name = ROVER_PROCESS_WEBSERVER },
         {.name = ROVER_PROCESS_ULTRASOUND},
         {.name = ROVER_PROCESS_LCD16     },
-        // {.name = ROVER_PROCESS_MONITOR   }
+        {.name = ROVER_PROCESS_MONITOR   }
 };
 
 static int processes_amount = sizeof(pList)/sizeof(pList[0]);

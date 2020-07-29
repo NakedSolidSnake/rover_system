@@ -5,6 +5,7 @@
 #include <app.h>
 #include <signal/signal.h>
 #include <rover_webserver.h>
+#include <context.h>
 
 #define ROVER_WEBSERVER "ROVER_WEBSERVER"
 
@@ -22,14 +23,19 @@ typedef struct
   int set;
 } method_t;
 
+static Context_st webserver_context;
+
 static int sender(char *buffer, int *size);
 static int receive(char *buffer, int size);
 static int sendPage(char *buffer, int *size);
+
+static void init(void);
+static void update_time(int s);
 static void end_server(int s);
 
 static method_t methods[] =
-    {
-        {.method = "GET", .size = 3, .call_method = sendPage, .set = 0},
+{
+  {.method = "GET", .size = 3, .call_method = sendPage, .set = 0},
 };
 
 #ifdef PROCESS
@@ -44,22 +50,25 @@ void *rover_webserver(void *args)
 {
   (void)args;
   Server_t server =
-      {
+  {
           .socket = -1,
           .port = "8081",
+          .timeout = 0,
           .cb.recv = receive,
-          .cb.send = sender};
+          .cb.send = sender
+  };
 
-  signal_register(end_server, SIGTERM);
+  init();
 
   Server_init(&server);
-  Server_exec(&server);
-}
+  while(1)
+  {
+    Server_exec(&server);
+    if(webserver_context.states.update_time){
 
-static void end_server(int s)
-{
-  logger(LOGGER_INFO, ROVER_WEBSERVER, "Server unlaunched.");
-  exit(s);
+      webserver_context.states.update_time = 0;
+    }
+  }
 }
 
 static int sender(char *buffer, int *size)
@@ -95,15 +104,7 @@ static int receive(char *buffer, int size)
 
 static int sendPage(char *buffer, int *size)
 {
-
-  MEM *mem = NULL;
-
-  mem = mem_get();
-  if(mem == NULL)
-  {
-    return 1;
-  }
-  
+ 
   char b[512];
 
   char msg[] =
@@ -126,12 +127,12 @@ static int sendPage(char *buffer, int *size)
     "</body>"
 "</html>";
 
-  snprintf(b, sizeof(b), msg, mem->status.motor_status.direction,
-                              mem->status.motor_status.power,
-                              mem->status.servo_status.position,
-                              mem->status.ultrasound_status.distance,
-                              mem->status.lcd16_status.msg_line1,
-                              mem->status.lcd16_status.msg_line2);
+  snprintf(b, sizeof(b), msg, webserver_context.mem->status.motor_status.direction,
+                              webserver_context.mem->status.motor_status.power,
+                              webserver_context.mem->status.servo_status.position,
+                              webserver_context.mem->status.ultrasound_status.distance,
+                              webserver_context.mem->status.lcd16_status.msg_line1,
+                              webserver_context.mem->status.lcd16_status.msg_line2);
 
   memset(buffer, 0, MAX_BUFFER_SEND_RECV);
   
@@ -144,4 +145,33 @@ static int sendPage(char *buffer, int *size)
                    strlen(b), "text/html", b);
   *size = strlen(buffer);
   return 0;
+}
+
+static void init(void)
+{
+  memset(&webserver_context, 0, sizeof(Context_st));
+
+  webserver_context.mem = mem_get();
+  if(!webserver_context.mem)
+  {
+    logger(LOGGER_INFO, ROVER_WEBSERVER, "Memory not initialized");
+    exit(EXIT_FAILURE);
+  }
+
+  signal_register(update_time, SIGUPDATETIME);
+  signal_register(end_server, SIGTERM);
+
+  logger(LOGGER_INFO, ROVER_WEBSERVER, "WEBSERVER initialized");
+
+}
+
+static void update_time(int s)
+{
+  webserver_context.states.update_time = 1;
+}
+
+static void end_server(int s)
+{
+  logger(LOGGER_INFO, ROVER_WEBSERVER, "Server unlaunched.");
+  exit(s);
 }

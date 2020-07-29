@@ -3,8 +3,8 @@
 #include <log/log.h>
 #include <signal/signal.h>
 #include <sharedmemory/sharedmemory.h>
-#include <app.h>
 #include <rover_mqtt.h>
+#include <context.h>
 
 #define ROVER_MQTT "ROVER_MQTT"
 
@@ -17,24 +17,15 @@
 #define ROVER_LCD16_TOPIC "/rover/lcd16/message"
 #define ROVER_ULTRASOUND_TOPIC "/rover/ultrasound/distance"
 
-static void publishMotor(MQTTClient client, MEM *mem);
-// static void publishMotor(MQTTClient client, const char *command);
-static void publishMotorPower(MQTTClient client, const char *command);
-static void publishMotorDirection(MQTTClient client, const char *command);
+static Context_st mqtt_context;
 
-static void publishServo(MQTTClient client, MEM *mem);
-// static void publishServo(MQTTClient client, const char *command);
-static void publicServoPosition(MQTTClient client, const char *command);
+static void publishMotor(MQTTClient client);
+static void publishServo(MQTTClient client);
+static void publishUltrasound(MQTTClient client);
+static void publishLCD(MQTTClient client);
 
-// static void publishUltrasound(MQTTClient client, const char *command);
-static void publishUltrasound(MQTTClient client, MEM *mem);
-static void publishUltrasoundDistance(MQTTClient client, const char *command);
-
-static void publishLCD(MQTTClient client, MEM *mem);
-// static void publishLCD(MQTTClient client, const char *command);
-static void publishLCDMessageLine1(MQTTClient client, const char *command);
-static void publishLCDMessageLine2(MQTTClient client, const char *command);
-
+static void init(void);
+static void update_time(int s);
 static void end_mqtt(int s);
 
 static int loop = 0;
@@ -63,7 +54,6 @@ int main(int argc, char const *argv[])
 void *rover_mqtt(void *args)
 {
   (void)args;
-  MEM *mem = NULL;
   MQTTClient client;
   MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
@@ -77,80 +67,83 @@ void *rover_mqtt(void *args)
     exit(-1);
   }
 
-  signal_register(end_mqtt, SIGTERM);
-
-  logger(LOGGER_INFO, ROVER_MQTT, "MQTT Started");
-
-  mem = mem_get();
-  if (mem == NULL)
-  {
-    return 1;
-  }
+  init();
 
   for (; loop != 1;)
   {
     //send temperature measurement
 
-    // publishMotor(client, m->command);
-    publishMotor(client, mem);
-    publishServo(client, mem);
-    publishUltrasound(client, mem);
-    publishLCD(client, mem);
-    // publishServo(client, s->command);
+    publishMotor(client);
+    publishServo(client);
+    publishUltrasound(client);
+    publishLCD(client);
+
+    if(mqtt_context.states.update_time){
+
+      mqtt_context.states.update_time = 0;
+    }
 
     sleep(3);
   }
   MQTTClient_disconnect(client, 1000);
   MQTTClient_destroy(&client);
-  return rc;
+  return NULL;
 }
 
-static void publishMotor(MQTTClient client, MEM *mem)
+static void publishMotor(MQTTClient client)
 {
   char data[10] = {0};
-  snprintf(data, 10, "%d", mem->status.motor_status.direction);
+  snprintf(data, 10, "%d", mqtt_context.mem->status.motor_status.direction);
   publish(client, ROVER_MOTOR_DIR_TOPIC, (char *)data);
   memset(data, 0, sizeof(data));
-  snprintf(data, 10, "%d", mem->status.motor_status.power);
+  snprintf(data, 10, "%d", mqtt_context.mem->status.motor_status.power);
   publish(client, ROVER_MOTOR_POWER_TOPIC, (char *)data);
 }
 
-static void publishMotorPower(MQTTClient client, const char *command)
+static void publishServo(MQTTClient client)
 {
-  publish(client, ROVER_MOTOR_POWER_TOPIC, (char *)command);
-}
-
-static void publishMotorDirection(MQTTClient client, const char *command)
-{
-  publish(client, ROVER_MOTOR_DIR_TOPIC, (char *)command);
-}
-
-static void publishServo(MQTTClient client, MEM *mem)
-{
-  char action[10] = {0};
   char data[10] = {0};
-  snprintf(data, 10, "%d", mem->status.servo_status.position);
+  snprintf(data, 10, "%d", mqtt_context.mem->status.servo_status.position);
   publish(client, ROVER_SERVO_TOPIC, (char *)data);
 }
 
-static void publicServoPosition(MQTTClient client, const char *command)
-{
-  publish(client, ROVER_SERVO_TOPIC, (char *)command);
-}
 
-static void publishUltrasound(MQTTClient client, MEM *mem)
+static void publishUltrasound(MQTTClient client)
 {
   char data[10] = {0};
-  snprintf(data, 10, "%0.2f", mem->status.ultrasound_status.distance);
+  snprintf(data, 10, "%0.2f", mqtt_context.mem->status.ultrasound_status.distance);
   publish(client, ROVER_ULTRASOUND_TOPIC, (char *)data);
 }
 
-static void publishLCD(MQTTClient client, MEM *mem)
+static void publishLCD(MQTTClient client)
 {
   char data[40] = {0};
-  lcd16_status_st *s = &mem->status.lcd16_status;
+  lcd16_status_st *s = &mqtt_context.mem->status.lcd16_status;
   snprintf(data, 40, "%s\n%s", s->msg_line1, s->msg_line2);
   publish(client, ROVER_LCD16_TOPIC, (char *)data);
+}
+
+
+static void init(void)
+{
+  memset(&mqtt_context, 0, sizeof(Context_st));
+
+  mqtt_context.mem = mem_get();
+  if(!mqtt_context.mem)
+  {
+    logger(LOGGER_INFO, ROVER_MQTT, "Memory not initialized");
+    exit(EXIT_FAILURE);
+  }
+
+  signal_register(update_time, SIGUPDATETIME);
+  signal_register(end_mqtt, SIGTERM);
+
+  logger(LOGGER_INFO, ROVER_MQTT, "MQTT initialized");
+}
+
+static void update_time(int s)
+{
+  mqtt_context.states.update_time = 1;
 }
 
 static void end_mqtt(int s)

@@ -1,8 +1,9 @@
-#include <app.h>
-#include <sharedmemory/sharedmemory.h>
 #include <stdlib.h>
 #include <string.h>
+#include <app.h>
+#include <log/log.h>
 
+#define ROVER_MEMORY "ROVER_MEMORY"
 
 int mem_init(void)
 {
@@ -23,7 +24,9 @@ int mem_init(void)
 
   mem->init = 1;
   mem->shm.id = shm.id;
-  mem->shm.shm = shm.shm;  
+  mem->shm.shm = shm.shm;
+
+  logger(LOGGER_INFO, ROVER_MEMORY, "Memory initialized");  
 
   return EXIT_SUCCESS;
 }
@@ -52,8 +55,6 @@ MEM *mem_get(void)
 
 int ipc_init(void)
 {
-  int ret;
-
   MEM *mem  = mem_get();
   if(!mem){
     return -1;
@@ -67,15 +68,14 @@ int ipc_init(void)
   semaphore_init(&mem->sema, SEMA_ID);
   if(mem->sema.id < 0)
   {
-    // logger(LOGGER_INFO, ROVER_LAUNCH, "Semaphore init failed");
-    // exit(1);
-    return -1;
+    logger(LOGGER_INFO, ROVER_MEMORY, "Semaphore init failed");
+    exit(1);
   }
 
   mem->queueid = queue_init(QUEUE_MANAGER_ID);
   if (mem->queueid < 0)
   {
-    // logger(LOGGER_INFO, ROVER_LAUNCH, "Queue Manager init failed");
+    logger(LOGGER_INFO, ROVER_MEMORY, "Queue Manager init failed");
     // exit(1);
     return -1;
   }
@@ -83,28 +83,12 @@ int ipc_init(void)
   mem->queue_server_id = queue_init(QUEUE_SERVER_ID);
   if (mem->queue_server_id < 0)
   {
-    // logger(LOGGER_INFO, ROVER_LAUNCH, "Queue Server init failed");
+    logger(LOGGER_INFO, ROVER_MEMORY, "Queue Server init failed");
     // exit(1);
     return -1;
   }
 
-  // logger(LOGGER_INFO, ROVER_LAUNCH, "Queue Initialized");
-
-  // ret = mem_init(&mem);
-  // if (ret)
-  // {
-  //   // logger(LOGGER_INFO, ROVER_LAUNCH, "Error to create process table");
-  //   return -1;
-  // }
-
-  // logger(LOGGER_INFO, ROVER_LAUNCH, "Memory Initialized");
-
   return 0;
-}
-
-int ipc_denit(void)
-{
-
 }
 
 int mem_denit(void)
@@ -121,6 +105,9 @@ int mem_denit(void)
   queue_destroy(mem->queue_server_id);
   sharedMemoryDestroy(&mem->shm);
   semaphore_destroy(&mem->sema);
+
+  logger(LOGGER_INFO, ROVER_MEMORY, "Memory  unitialized");
+  return 0;
 }
 
 int memoryWrite(MEM * mem, void *data, int offset)

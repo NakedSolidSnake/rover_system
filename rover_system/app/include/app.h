@@ -3,6 +3,7 @@
 
 #include <sharedmemory/sharedmemory.h>
 #include <semaphore/semaphore.h>
+#include <queue/queue.h>
 #include <rover_status.h>
 #include <rover_types.h>
 #include <time.h>
@@ -75,6 +76,5 @@ MEM *mem_get(void);
 int memoryWrite(MEM * mem, void *data, int offset);
 
 int ipc_init(void);
-int ipc_denit(void);
 
 #endif

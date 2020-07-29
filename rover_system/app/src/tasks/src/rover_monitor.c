@@ -2,10 +2,11 @@
 #include <rover_monitor.h>
 #include <app.h>
 #include <sys/types.h>
+#include <log/log.h>
 
 #define ROVER_MONITOR  "ROVER_MONITOR"
 
-static int verifyTime(struct timespec *current, time_t timeout, process_st *process);
+static int verifyTime( time_t timeout, process_st *process);
 
 int main(int argc, char const *argv[])
 {
@@ -32,7 +33,7 @@ int main(int argc, char const *argv[])
         for(i = 0; i < (mem->process_amount - 1); i++)
         {   
             process_st *process = &mem->processes[i];       
-            ret = verifyTime(&current, t, process);
+            ret = verifyTime(t, process);
 
             if(!ret){                
                 process->old = process->update;
@@ -40,7 +41,7 @@ int main(int argc, char const *argv[])
             }else{
                            
                 if(process->miss_count == 3){
-                    printf("Process %s unable to respond\n", process->name);
+                    loggerArgs(LOGGER_INFO, ROVER_MONITOR, "Process %s unable to respond\n", process->name);
                     // printf("Killing process %s\n", process->name);
                     // kill(process->pid, SIGKILL);
                     // printf("recover process %s\n", process->name);                    
@@ -58,7 +59,7 @@ int main(int argc, char const *argv[])
                     //     process->miss_count = 0;                        
                     // }
                 }else {
-                    printf("send signal to process %s pid %d\n", process->name, process->pid);
+                    loggerArgs(LOGGER_INFO, ROVER_MONITOR, "send signal to process %s pid %d\n", process->name, process->pid);
                     //wait for response
                     kill(process->pid, SIGUSR1);  
                     process->miss_count ++;   
@@ -72,9 +73,8 @@ int main(int argc, char const *argv[])
     return 0;
 }
 
-static int verifyTime(struct timespec *current, time_t timeout, process_st *process)
+static int verifyTime(time_t timeout, process_st *process)
 {
     double _timeout = (timeout / 1000000000) + (timeout % 1000000000)/(double)1000000000;    
-    double _current = (double)current->tv_sec  + (double)current->tv_nsec /(double)1000000000;
     return ((process->old + _timeout) > process->update);
 }
