@@ -35,6 +35,7 @@ void *rover_server(void *args)
   {
     .socket = -1,
     .port = "8080",
+    .timeout = 250000,
     .cb.recv = receive,
     .cb.send = sender
   };
@@ -42,7 +43,17 @@ void *rover_server(void *args)
   init();
 
   Server_init(&server);
-  Server_exec(&server);
+
+  while(1)
+  {
+    Server_exec(&server);
+    if(server_context.states.update_time){
+
+      server_context.states.update_time = 0;
+    }
+  }
+  
+  Server_close(&server);
 
   return NULL;
 }
