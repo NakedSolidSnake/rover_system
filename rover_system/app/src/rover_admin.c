@@ -27,7 +27,9 @@ typedef enum opt_e
   OPT_ULTRASOUND,
   OPT_LCD,
   OPT_SEMA,
-  OPT_IPCS
+  OPT_IPCS, 
+  OPT_MONITOR_ON,
+  OPT_MONITOR_OFF
 } opt_et;
 
 struct table
@@ -46,6 +48,8 @@ static int ultrasound(char **args, MEM *mem);
 static int lcd16(char **args, MEM *mem);
 static int sema(char **args, MEM *mem);
 static int ipcs(char **args, MEM *mem);
+static int monitor_on(char **args, MEM *mem);
+static int monitor_off(char **args, MEM *mem);
 
 static char *isRunning(int pid)
 {
@@ -85,6 +89,8 @@ int main(int argc, char **argv)
           {"lcd", ARGS_NO, NULL, OPT_LCD},
           {"sema", ARGS_NO, NULL, OPT_SEMA},
           {"ipcs", ARGS_NO, NULL, OPT_IPCS},
+          {"monitor_on", ARGS_NO, NULL, OPT_MONITOR_ON},
+          {"monitor_off", ARGS_NO, NULL, OPT_MONITOR_OFF},
           {NULL, ARGS_NO, NULL, 0}};
 
   const struct table tab[] =
@@ -99,6 +105,8 @@ int main(int argc, char **argv)
           {.opt = OPT_LCD, .pfunc = lcd16},
           {.opt = OPT_SEMA, .pfunc = sema},
           {.opt = OPT_IPCS, .pfunc = ipcs},
+          {.opt = OPT_MONITOR_ON, .pfunc = monitor_on},
+          {.opt = OPT_MONITOR_OFF, .pfunc = monitor_off},
       };
 
   const int table_size = sizeof(tab) / sizeof(tab[0]);
@@ -116,6 +124,8 @@ int main(int argc, char **argv)
     case OPT_ULTRASOUND:
     case OPT_LCD:
     case OPT_IPCS:
+    case OPT_MONITOR_ON:
+    case OPT_MONITOR_OFF:
       break;
 
     default: 
@@ -161,6 +171,8 @@ static int help(char **args, MEM *mem)
   fprintf(stderr, "--lcd   \t\t Show lcd status\n");
   fprintf(stderr, "--queue   \t\t Show Queue used by program\n");
   fprintf(stderr, "--ipcs   \t\t Show all IPC used by program\n");
+  fprintf(stderr, "--monitor_on   \t\t Sets Monitor in running state\n");
+  fprintf(stderr, "--monitor_off   \t\t Sets Monitor in pause state\n");
   return 0;
 }
 
@@ -291,7 +303,7 @@ static int sema(char **args, MEM *mem)
   char command[256] = {0};
   char command_out[256] = {0};
   printf("SEMAPHORE_ID\n");
-  snprintf(command, sizeof(command), "ipcs -s | grep %08x", SEMA_ID);
+  snprintf(command, sizeof(command), "ipcs -s | grep %08x", SEMA_MESSAGE_ID);
 
   pipe = popen(command, "r");
   if (pipe == NULL)
@@ -310,5 +322,25 @@ static int ipcs(char **args, MEM *mem)
   queue(args, mem);
   shm(args, mem);
   sema(args, mem);
+  printf("Queue Server ID in memory: %d.\n", mem->queue_server_id);
+  printf("Queue Manager ID in memory: %d.\n", mem->queueid);
+  printf("Semaphore Message ID in memory: %d.\n", mem->sema_message.id);
+  printf("Semaphore Update ID in memory: %d.\n", mem->sema_update.id);
+  printf("Shared Memory ID in memory: %d.\n", mem->shm.id);
+  printf("Shared Memory ADDRESS in memory: %p.\n", mem->shm.shm);
+  return 0;
+}
+
+static int monitor_on(char **args, MEM *mem)
+{  
+  mem->monitor_enable = 1;
+  printf("monitor is running.\n");
+  return 0;
+}
+
+static int monitor_off(char **args, MEM *mem)
+{
+  mem->monitor_enable = 0;
+  printf("monitor is stopped.\n");
   return 0;
 }

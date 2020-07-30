@@ -10,7 +10,6 @@
 static Context_st manager_context;
 
 static void init(void);
-static void message_received(int s);
 static void update_time(int s);
 static void end_manager(int s);
 
@@ -35,8 +34,25 @@ void *rover_manager(void *args)
 
   while(1)
   {
-    if(queue_recv(manager_context.mem->queueid, &manager_context.queue, sizeof(manager_context.queue.bData), 0) < 0){
-      logger(LOGGER_INFO, ROVER_MANAGER, "Queue receive error.");
+    if(queue_recv(manager_context.mem->queueid, &manager_context.queue, sizeof(manager_context.queue.bData), 1000000000) < 0){
+      // logger(LOGGER_INFO, ROVER_MANAGER, "Queue receive error.");
+      if(manager_context.states.update_time)
+      {
+        int index = get_pid(getpid());
+        if(index >= 0 &&  index < manager_context.mem->process_amount)
+        {
+          clock_gettime(CLOCK_MONOTONIC, &manager_context.current);
+
+          // if (semaphore_lock(&manager_context.sema_update) == 0)
+          {
+            manager_context.mem->processes[index].update = (time_t)((double)manager_context.current.tv_sec + (double)manager_context.current.tv_nsec / (double)1000000000);
+            // semaphore_unlock(&manager_context.sema_update);
+            manager_context.states.update_time = 0;
+            alarm(PROCESS_CICLE_SECONDS);
+          }
+        }        
+      }
+      usleep(1000);
       continue;
     } 
 
@@ -83,11 +99,11 @@ int manager_route(int id, const char *command)
       return -1;
   }
 
-  if (semaphore_lock(&manager_context.sema) == 0)
+  // if (semaphore_lock(&manager_context.sema_message) == 0)
   {
     memset(manager_context.mem->msg.command, 0, sizeof(manager_context.mem->msg.command));
     memcpy(manager_context.mem->msg.command, command, strlen(command));
-    semaphore_unlock(&manager_context.sema);
+    // semaphore_unlock(&manager_context.sema_message);
   }
 
   emitSignal(proc);
@@ -119,19 +135,28 @@ static void init(void)
     exit(EXIT_FAILURE);
   }
 
-  manager_context.sema.id = -1;
-  manager_context.sema.sema_count = 1;
-  manager_context.sema.state = LOCKED;
-  manager_context.sema.master = SLAVE;
+  manager_context.sema_message.id = -1;
+  manager_context.sema_message.sema_count = 1;
+  manager_context.sema_message.state = LOCKED;
+  manager_context.sema_message.master = SLAVE;
 
-  semaphore_init(&manager_context.sema, SEMA_ID);
+  semaphore_init(&manager_context.sema_message, SEMA_MESSAGE_ID);
+
+  manager_context.sema_update.id = -1;
+  manager_context.sema_update.sema_count = 1;
+  manager_context.sema_update.state = LOCKED;
+  manager_context.sema_update.master = SLAVE;
+
+  semaphore_init(&manager_context.sema_update, SEMA_UPDATE_ID);
   
   signal_register(update_time, SIGUPDATETIME);
+  signal_register(update_time, SIGALRM);
   signal_register(end_manager, SIGTERM);
 
   manager_context.queue.queueType = 1;
 
   logger(LOGGER_INFO, ROVER_MANAGER, "MANAGER initialized");
+  alarm(PROCESS_CICLE_SECONDS);
 }
 
 static void update_time(int s)
@@ -142,5 +167,7 @@ static void update_time(int s)
 void end_manager(int s)
 {
   logger(LOGGER_INFO, ROVER_MANAGER, "MANAGER unlaunched");
+  semaphore_unlock(&manager_context.sema_update);
+  semaphore_unlock(&manager_context.sema_message);
   exit(s);
 }

@@ -32,7 +32,8 @@ int main()
   queue_destroy(mem->queueid);  
   queue_destroy(mem->queue_server_id);
   sharedMemoryDestroy(&mem->shm);
-  semaphore_destroy(&mem->sema);
+  semaphore_destroy(&mem->sema_message);
+  semaphore_destroy(&mem->sema_update);
 
   return EXIT_SUCCESS;
 }

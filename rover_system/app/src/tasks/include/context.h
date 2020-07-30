@@ -5,6 +5,7 @@
 #include <queue/queue.h>
 #include <rover_types.h>
 #include <semaphore/semaphore.h>
+#include <sys/time.h> 
 
 typedef struct State
 {
@@ -18,8 +19,10 @@ typedef struct Context
     MEM *mem;
     queue_st queue;
     message_st msg;
-    sema_t sema;
-    States_st states;    
+    sema_t sema_message;
+    sema_t sema_update;
+    States_st states;
+    struct timespec current; 
 }Context_st;
 
 #endif

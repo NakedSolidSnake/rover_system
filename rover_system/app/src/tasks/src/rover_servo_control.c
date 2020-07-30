@@ -40,7 +40,7 @@ void *rover_servo_control(void *args)
       logger(LOGGER_INFO, ROVER_SERVO, servo_context.msg.command);
       //call command here
       
-      if (semaphore_lock(&servo_context.sema) == 0)
+      // if (semaphore_lock(&servo_context.sema_message) == 0)
       {
         servo_action_select(servo_context.msg.command, strlen(servo_context.msg.command));
         servo_context.queue.queueType = 1;
@@ -49,14 +49,24 @@ void *rover_servo_control(void *args)
                                                                                (int)strlen(servo_context.msg.command),
                                                                                servo_context.msg.command);
         queue_send(servo_context.mem->queue_server_id, &servo_context.queue, (int)strlen(servo_context.queue.bData) + 1);
-        semaphore_unlock(&servo_context.sema);
+        // semaphore_unlock(&servo_context.sema_message);
       }
       servo_context.states.message_received = 0;
     }
 
     else if(servo_context.states.update_time){
-
+      int index = get_pid(getpid());
+      if(index >= 0 &&  index < servo_context.mem->process_amount)
+      {
+        clock_gettime(CLOCK_MONOTONIC, &servo_context.current);        
+        // if (semaphore_lock(&servo_context.sema_update) == 0)
+        {
+          servo_context.mem->processes[index].update = (time_t)((double)servo_context.current.tv_sec + (double)servo_context.current.tv_nsec/(double)1000000000);
+          // semaphore_unlock(&servo_context.sema_update);
+        }
+      }
       servo_context.states.update_time = 0;
+      alarm(PROCESS_CICLE_SECONDS);
     }
 
     else
@@ -80,18 +90,27 @@ static void init(void)
     exit(EXIT_FAILURE);
   }
 
-  servo_context.sema.id = -1;
-  servo_context.sema.sema_count = 1;
-  servo_context.sema.state = LOCKED;
-  servo_context.sema.master = SLAVE;
+  servo_context.sema_message.id = -1;
+  servo_context.sema_message.sema_count = 1;
+  servo_context.sema_message.state = LOCKED;
+  servo_context.sema_message.master = SLAVE;
 
-  semaphore_init(&servo_context.sema, SEMA_ID);
+  semaphore_init(&servo_context.sema_message, SEMA_MESSAGE_ID);
+
+  servo_context.sema_update.id = -1;
+  servo_context.sema_update.sema_count = 1;
+  servo_context.sema_update.state = LOCKED;
+  servo_context.sema_update.master = SLAVE;
+
+  semaphore_init(&servo_context.sema_update, SEMA_UPDATE_ID);
   
   signal_register(message_received, SIGMESSAGERECEIVED);
   signal_register(update_time, SIGUPDATETIME);
+  signal_register(update_time, SIGALRM);
   signal_register(end_servo, SIGTERM);
 
   logger(LOGGER_INFO, ROVER_SERVO, "SERVO initialized");
+  alarm(PROCESS_CICLE_SECONDS);
 }
 
 void message_received(int s)
@@ -107,5 +126,7 @@ static void update_time(int s)
 void end_servo(int s)
 {
   logger(LOGGER_INFO, ROVER_SERVO, "SERVO unlaunched");
+  semaphore_unlock(&servo_context.sema_update);
+  semaphore_unlock(&servo_context.sema_message);
   exit(s);
 }

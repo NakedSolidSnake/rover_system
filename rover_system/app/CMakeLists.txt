@@ -4,6 +4,7 @@ target_sources(app
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/lib/memory_init.c 
   ${CMAKE_CURRENT_LIST_DIR}/lib/protocol.c 
+  ${CMAKE_CURRENT_LIST_DIR}/lib/utils.c 
   )
 target_include_directories(app 
   PUBLIC 

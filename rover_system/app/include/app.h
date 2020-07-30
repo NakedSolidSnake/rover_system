@@ -6,6 +6,7 @@
 #include <queue/queue.h>
 #include <rover_status.h>
 #include <rover_types.h>
+#include <sys/types.h>
 #include <time.h>
 
 #define PROC_NAME_MAX     80
@@ -15,7 +16,8 @@
 #define QUEUE_SERVER_ID   101
 
 // Semaphore id's
-#define SEMA_ID           1234 
+#define SEMA_MESSAGE_ID           1234 
+#define SEMA_UPDATE_ID            1235 
 
 // Shared Memory id's
 
@@ -37,7 +39,15 @@
 #define ROVER_PROCESS_MONITOR       "/home/cssouza/rover/bin/rover_monitor"
 
 //Process amount
-#define PROCESS_AMOUNT 8
+#define PROCESS_AMOUNT 9
+
+#define MONITOR_MAX_TRY   3
+
+#define MONITOR_CICLE_SECONDS   6 
+
+#define PROCESS_CICLE_SECONDS   3
+
+#define MQTT_CICLE_SECONDS      3
 
 typedef struct process
 {
@@ -45,7 +55,7 @@ typedef struct process
   char name[PROC_NAME_MAX];
   time_t update;
   time_t old; 
-  int miss_count;
+  unsigned char miss_count;
 
 }process_st;
 
@@ -56,10 +66,13 @@ typedef struct MEM
   shm_t shm;
   int queueid;
   int queue_server_id;
-  sema_t sema;
+  sema_t sema_message;
+  sema_t sema_update;
   message_st msg;
   Status_st status; 
-  int process_amount; 
+  int process_amount;
+  unsigned char monitor_enable : 1; 
+  unsigned char RFU : 7;
 }MEM;
 
 typedef enum TYPE{
@@ -76,5 +89,8 @@ MEM *mem_get(void);
 int memoryWrite(MEM * mem, void *data, int offset);
 
 int ipc_init(void);
+
+int get_pid(pid_t pid);
+
 
 #endif

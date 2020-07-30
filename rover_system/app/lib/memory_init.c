@@ -26,6 +26,8 @@ int mem_init(void)
   mem->shm.id = shm.id;
   mem->shm.shm = shm.shm;
 
+  mem->monitor_enable = 1;
+
   logger(LOGGER_INFO, ROVER_MEMORY, "Memory initialized");  
 
   return EXIT_SUCCESS;
@@ -60,15 +62,27 @@ int ipc_init(void)
     return -1;
   }
   
-  mem->sema.id = -1;
-  mem->sema.sema_count = 1;
-  mem->sema.state = LOCKED;
-  mem->sema.master = MASTER;
+  mem->sema_message.id = -1;
+  mem->sema_message.sema_count = 1;
+  mem->sema_message.state = LOCKED;
+  mem->sema_message.master = MASTER;
 
-  semaphore_init(&mem->sema, SEMA_ID);
-  if(mem->sema.id < 0)
+  semaphore_init(&mem->sema_message, SEMA_MESSAGE_ID);
+  if(mem->sema_message.id < 0)
   {
-    logger(LOGGER_INFO, ROVER_MEMORY, "Semaphore init failed");
+    logger(LOGGER_INFO, ROVER_MEMORY, "Semaphore Message init failed");
+    exit(1);
+  }
+
+  mem->sema_update.id = -1;
+  mem->sema_update.sema_count = 1;
+  mem->sema_update.state = LOCKED;
+  mem->sema_update.master = MASTER;
+
+  semaphore_init(&mem->sema_update, SEMA_UPDATE_ID);
+  if(mem->sema_update.id < 0)
+  {
+    logger(LOGGER_INFO, ROVER_MEMORY, "Semaphore Update init failed");
     exit(1);
   }
 
@@ -104,7 +118,8 @@ int mem_denit(void)
   queue_destroy(mem->queueid);  
   queue_destroy(mem->queue_server_id);
   sharedMemoryDestroy(&mem->shm);
-  semaphore_destroy(&mem->sema);
+  semaphore_destroy(&mem->sema_message);
+  semaphore_destroy(&mem->sema_update);
 
   logger(LOGGER_INFO, ROVER_MEMORY, "Memory  unitialized");
   return 0;

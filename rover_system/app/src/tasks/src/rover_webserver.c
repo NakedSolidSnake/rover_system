@@ -53,7 +53,7 @@ void *rover_webserver(void *args)
   {
           .socket = -1,
           .port = "8081",
-          .timeout = 0,
+          .timeout = 250000,
           .cb.recv = receive,
           .cb.send = sender
   };
@@ -65,10 +65,22 @@ void *rover_webserver(void *args)
   {
     Server_exec(&server);
     if(webserver_context.states.update_time){
-
+      int index = get_pid(getpid());
+      if(index >= 0 &&  index < webserver_context.mem->process_amount)
+      {
+        clock_gettime(CLOCK_MONOTONIC, &webserver_context.current);
+        // if (semaphore_lock(&webserver_context.sema_update) == 0)
+        {
+          webserver_context.mem->processes[index].update = (time_t)((double)webserver_context.current.tv_sec + (double)webserver_context.current.tv_nsec/(double)1000000000);
+          // semaphore_unlock(&webserver_context.sema_update);
+        }
+      }     
+      
       webserver_context.states.update_time = 0;
+      alarm(PROCESS_CICLE_SECONDS);
     }
   }
+  Server_close(&server);
 }
 
 static int sender(char *buffer, int *size)
@@ -158,10 +170,19 @@ static void init(void)
     exit(EXIT_FAILURE);
   }
 
+  webserver_context.sema_update.id = -1;
+  webserver_context.sema_update.sema_count = 1;
+  webserver_context.sema_update.state = LOCKED;
+  webserver_context.sema_update.master = SLAVE;
+
+  semaphore_init(&webserver_context.sema_update, SEMA_UPDATE_ID);
+
   signal_register(update_time, SIGUPDATETIME);
+  signal_register(update_time, SIGALRM);
   signal_register(end_server, SIGTERM);
 
   logger(LOGGER_INFO, ROVER_WEBSERVER, "WEBSERVER initialized");
+  alarm(PROCESS_CICLE_SECONDS);
 
 }
 
@@ -173,5 +194,7 @@ static void update_time(int s)
 static void end_server(int s)
 {
   logger(LOGGER_INFO, ROVER_WEBSERVER, "Server unlaunched.");
+  semaphore_unlock(&webserver_context.sema_update);
+  semaphore_unlock(&webserver_context.sema_message);
   exit(s);
 }

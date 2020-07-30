@@ -79,11 +79,22 @@ void *rover_mqtt(void *args)
     publishLCD(client);
 
     if(mqtt_context.states.update_time){
-
+      int index = get_pid(getpid());
+      if(index >= 0 &&  index < mqtt_context.mem->process_amount)
+      {
+        clock_gettime(CLOCK_MONOTONIC, &mqtt_context.current);
+        // if (semaphore_lock(&mqtt_context.sema_update) == 0)
+        {
+          mqtt_context.mem->processes[index].update = (time_t)((double)mqtt_context.current.tv_sec + (double)mqtt_context.current.tv_nsec/(double)1000000000);
+          // semaphore_unlock(&mqtt_context.sema_update);
+        }
+        
+      }
       mqtt_context.states.update_time = 0;
+      alarm(PROCESS_CICLE_SECONDS);
     }
 
-    sleep(3);
+    sleep(MQTT_CICLE_SECONDS);
   }
   MQTTClient_disconnect(client, 1000);
   MQTTClient_destroy(&client);
@@ -135,10 +146,19 @@ static void init(void)
     exit(EXIT_FAILURE);
   }
 
+  mqtt_context.sema_update.id = -1;
+  mqtt_context.sema_update.sema_count = 1;
+  mqtt_context.sema_update.state = LOCKED;
+  mqtt_context.sema_update.master = SLAVE;
+
+  semaphore_init(&mqtt_context.sema_update, SEMA_UPDATE_ID);
+
   signal_register(update_time, SIGUPDATETIME);
+  signal_register(update_time, SIGALRM);
   signal_register(end_mqtt, SIGTERM);
 
   logger(LOGGER_INFO, ROVER_MQTT, "MQTT initialized");
+  alarm(PROCESS_CICLE_SECONDS);
 }
 
 static void update_time(int s)
@@ -149,5 +169,7 @@ static void update_time(int s)
 static void end_mqtt(int s)
 {
   logger(LOGGER_INFO, ROVER_MQTT, "MQTT Termined");
+  semaphore_unlock(&mqtt_context.sema_update);
+  semaphore_unlock(&mqtt_context.sema_message);
   loop = 1;
 }
