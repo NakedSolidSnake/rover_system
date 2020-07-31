@@ -101,8 +101,8 @@ target_include_directories(rover_webserver
   )
 
   # thread
-add_executable(thread "")
-target_link_libraries(thread
+add_executable(rover_thread "")
+target_link_libraries(rover_thread
  PUBLIC
   rover_webserver
   rover_mqtt
@@ -114,26 +114,26 @@ target_link_libraries(thread
   rover_server
   pthread
   )
-target_sources(thread
+target_sources(rover_thread
 PUBLIC 
-${CMAKE_CURRENT_LIST_DIR}/thread.c
+${CMAKE_CURRENT_LIST_DIR}/rover_thread.c
 )
-target_include_directories(thread 
+target_include_directories(rover_thread 
 PUBLIC 
 ${CMAKE_SOURCE_DIR}/src/tasks
 )
-install(TARGETS thread DESTINATION bin)
+install(TARGETS rover_thread DESTINATION bin)
 
  # thread_kill
-add_executable(thread_kill "")
-target_link_libraries(thread_kill PUBLIC  app)
-target_sources(thread_kill
+add_executable(rover_thread_kill "")
+target_link_libraries(rover_thread_kill PUBLIC  app)
+target_sources(rover_thread_kill
 PUBLIC 
-${CMAKE_CURRENT_LIST_DIR}/thread_kill.c
+${CMAKE_CURRENT_LIST_DIR}/rover_thread_kill.c
 )
-target_include_directories(thread_kill 
+target_include_directories(rover_thread_kill 
 PUBLIC 
 ${CMAKE_SOURCE_DIR}/src/tasks
 ${CMAKE_CURRENT_LIST_DIR}/../../include
 )
-install(TARGETS thread_kill DESTINATION bin)
+install(TARGETS rover_thread_kill DESTINATION bin)
