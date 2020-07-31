@@ -8,3 +8,9 @@ fi
 echo "Creating links"
 ln -fs /home/cssouza/rover/dat/rover.service /etc/systemd/system/rover.service
 ln -fs /home/cssouza/rover/dat/rover_syslog.conf /etc/rsyslog.d/rover_syslog.conf
+
+echo "Reloading Systemctl"
+systemctl daemon-reload
+
+echo "Restarting Syslog"
+systemctl restart syslog

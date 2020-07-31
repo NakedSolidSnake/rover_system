@@ -62,5 +62,5 @@ include (CPack)
 
 # Copy Files to dat dir
 install(FILES config/rover_syslog.conf PERMISSIONS OWNER_WRITE OWNER_READ DESTINATION dat)
-install(FILES config/rover.service PERMISSIONS OWNER_WRITE OWNER_READ DESTINATION dat)
+install(FILES config/${MODE}/rover.service PERMISSIONS OWNER_WRITE OWNER_READ DESTINATION dat)
 

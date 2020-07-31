@@ -73,6 +73,7 @@ typedef struct MEM
   int process_amount;
   unsigned char monitor_enable : 1; 
   unsigned char RFU : 7;
+  pid_t thread_pid;
 }MEM;
 
 typedef enum TYPE{

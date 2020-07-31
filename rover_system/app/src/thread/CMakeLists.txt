@@ -123,3 +123,17 @@ PUBLIC
 ${CMAKE_SOURCE_DIR}/src/tasks
 )
 install(TARGETS thread DESTINATION bin)
+
+ # thread_kill
+add_executable(thread_kill "")
+target_link_libraries(thread_kill PUBLIC  app)
+target_sources(thread_kill
+PUBLIC 
+${CMAKE_CURRENT_LIST_DIR}/thread_kill.c
+)
+target_include_directories(thread_kill 
+PUBLIC 
+${CMAKE_SOURCE_DIR}/src/tasks
+${CMAKE_CURRENT_LIST_DIR}/../../include
+)
+install(TARGETS thread_kill DESTINATION bin)

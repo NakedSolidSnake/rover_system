@@ -1,0 +1,19 @@
+[Unit]
+Description=Rover System
+After=network.target
+StartLimitIntervalSec=1
+
+[Service]
+Type=simple
+Restart=no
+TimeoutSec=5min
+IgnoreSIGPIPE=no
+KillMode=process
+RemainAfterExit=yes
+User=cssouza
+ExecStart=/home/cssouza/rover/bin/thread
+ExecStop=/home/cssouza/rover/bin/thread_kill
+
+
+[Install]
+WantedBy=multi-user.target
