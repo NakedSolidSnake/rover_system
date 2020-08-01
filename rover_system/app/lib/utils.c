@@ -1,6 +1,6 @@
 #include <app.h>
 
-int get_pid(pid_t pid)
+int get_index_from_pid(pid_t pid)
 {
     int i;
     MEM *mem = mem_get();

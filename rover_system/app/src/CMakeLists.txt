@@ -1,3 +1,17 @@
+# auxiliar
+add_library(auxiliar "")
+target_link_libraries(auxiliar PUBLIC app)
+target_sources(auxiliar
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/tasks/libs/auxiliar.c
+  )
+target_include_directories(auxiliar
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/tasks/libs
+  ${CMAKE_CURRENT_LIST_DIR}/tasks/include
+  )
+
+
 #------------------------------------------------------------------------------------------------------
 #rover_client
 #------------------------------------------------------------------------------------------------------

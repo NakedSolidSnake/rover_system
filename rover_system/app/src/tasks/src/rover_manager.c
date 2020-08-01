@@ -4,6 +4,7 @@
 #include <protocol.h>
 #include <rover_manager.h>
 #include <context.h>
+#include <auxiliar.h>
 
 #define ROVER_MANAGER   "ROVER_MANAGER"
 
@@ -38,19 +39,8 @@ void *rover_manager(void *args)
       // logger(LOGGER_INFO, ROVER_MANAGER, "Queue receive error.");
       if(manager_context.states.update_time)
       {
-        int index = get_pid(getpid());
-        if(index >= 0 &&  index < manager_context.mem->process_amount)
-        {
-          clock_gettime(CLOCK_MONOTONIC, &manager_context.current);
-
-          // if (semaphore_lock(&manager_context.sema_update) == 0)
-          {
-            manager_context.mem->processes[index].update = (time_t)((double)manager_context.current.tv_sec + (double)manager_context.current.tv_nsec / (double)1000000000);
-            // semaphore_unlock(&manager_context.sema_update);
-            manager_context.states.update_time = 0;
-            alarm(PROCESS_CICLE_SECONDS);
-          }
-        }        
+        update_clock(getpid(), &manager_context);
+        alarm(PROCESS_CICLE_SECONDS);                
       }
       usleep(1000);
       continue;

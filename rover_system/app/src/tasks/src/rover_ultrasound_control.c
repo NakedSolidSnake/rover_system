@@ -5,6 +5,7 @@
 #include <hc_sr04.h>
 #include <rover_ultrasound_control.h>
 #include <context.h>
+#include <auxiliar.h>
 
 #define ROVER_ULTRASOUND   "ROVER_ULTRASOUND"
 
@@ -50,17 +51,7 @@ void *rover_ultrasound_control(void *args)
     } 
 
     else if(ultrasound_context.states.update_time){
-      int index = get_pid(getpid());
-      if(index >= 0 &&  index < ultrasound_context.mem->process_amount)
-      {
-        clock_gettime(CLOCK_MONOTONIC, &ultrasound_context.current);
-        // if (semaphore_lock(&ultrasound_context.sema_update) == 0)
-        {
-          ultrasound_context.mem->processes[index].update = (time_t)((double)ultrasound_context.current.tv_sec + (double)ultrasound_context.current.tv_nsec/(double)1000000000);
-          // semaphore_unlock(&ultrasound_context.sema_update);
-        }
-      }
-      ultrasound_context.states.update_time = 0;
+      update_clock(getpid(), &ultrasound_context);
       alarm(PROCESS_CICLE_SECONDS);
     }
 
@@ -104,7 +95,7 @@ static void init(void)
   signal_register(update_time, SIGALRM);
   signal_register(end_ultrasound, SIGTERM);
 
-  logger(LOGGER_INFO, ROVER_ULTRASOUND, "ULTRASOUND initialized");
+  logger(LOGGER_INFO, ROVER_ULTRASOUND, "Initialized");
   alarm(PROCESS_CICLE_SECONDS);
 }
 
@@ -120,7 +111,7 @@ static void update_time(int s)
 
 void end_ultrasound(int s)
 {
-  logger(LOGGER_INFO, ROVER_ULTRASOUND, "ULTRASOUND unlaunched");
+  logger(LOGGER_INFO, ROVER_ULTRASOUND, "Unlaunched");
   semaphore_unlock(&ultrasound_context.sema_update);
   semaphore_unlock(&ultrasound_context.sema_message);
   exit(s);

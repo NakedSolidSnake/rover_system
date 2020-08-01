@@ -91,7 +91,7 @@ int memoryWrite(MEM * mem, void *data, int offset);
 
 int ipc_init(void);
 
-int get_pid(pid_t pid);
+int get_index_from_pid(pid_t pid);
 
 
 #endif

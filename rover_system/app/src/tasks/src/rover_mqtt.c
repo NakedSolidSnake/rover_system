@@ -5,6 +5,7 @@
 #include <sharedmemory/sharedmemory.h>
 #include <rover_mqtt.h>
 #include <context.h>
+#include <auxiliar.h>
 
 #define ROVER_MQTT "ROVER_MQTT"
 
@@ -79,18 +80,7 @@ void *rover_mqtt(void *args)
     publishLCD(client);
 
     if(mqtt_context.states.update_time){
-      int index = get_pid(getpid());
-      if(index >= 0 &&  index < mqtt_context.mem->process_amount)
-      {
-        clock_gettime(CLOCK_MONOTONIC, &mqtt_context.current);
-        // if (semaphore_lock(&mqtt_context.sema_update) == 0)
-        {
-          mqtt_context.mem->processes[index].update = (time_t)((double)mqtt_context.current.tv_sec + (double)mqtt_context.current.tv_nsec/(double)1000000000);
-          // semaphore_unlock(&mqtt_context.sema_update);
-        }
-        
-      }
-      mqtt_context.states.update_time = 0;
+      update_clock(getpid(), &mqtt_context);
       alarm(PROCESS_CICLE_SECONDS);
     }
 

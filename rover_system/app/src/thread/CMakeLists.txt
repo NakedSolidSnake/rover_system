@@ -65,7 +65,7 @@ target_include_directories(rover_ultrasound_control
 
 #rover_lcd16_control
 add_library(rover_lcd16_control "")
-target_link_libraries(rover_lcd16_control PUBLIC ipc drivers app)
+target_link_libraries(rover_lcd16_control PUBLIC ipc drivers app auxiliar)
 target_sources(rover_lcd16_control
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/../tasks/src/rover_lcd16_control.c
@@ -73,7 +73,9 @@ target_sources(rover_lcd16_control
 target_include_directories(rover_lcd16_control
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/../tasks/include
+  ${CMAKE_CURRENT_LIST_DIR}/../tasks/libs
   ${CMAKE_CURRENT_LIST_DIR}/driver/include
+  
   )
 
 #rover_mqtt

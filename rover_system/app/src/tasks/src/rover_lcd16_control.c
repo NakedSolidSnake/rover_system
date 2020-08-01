@@ -5,6 +5,7 @@
 #include <lcd16.h>
 #include <rover_lcd16_control.h>
 #include <context.h>
+#include <auxiliar.h>
 
 #define ROVER_LCD16   "ROVER_LCD16"
 
@@ -44,8 +45,8 @@ void *rover_lcd16_control(void *args)
         lcd16_context.queue.queueType = 1;
         snprintf(lcd16_context.queue.bData, sizeof(lcd16_context.queue.bData) ,"$:%04d:%04d:%s:FFFF:#",
                                                                               LCD16_ID,
-                                                                              (int)strlen(lcd16_context.mem->status.lcd16_status.msg_line1),
-                                                                              lcd16_context.mem->status.lcd16_status.msg_line1);        
+                                                                              (int)strlen(lcd16_context.msg.command),
+                                                                               lcd16_context.msg.command);        
 
         queue_send(lcd16_context.mem->queue_server_id, &lcd16_context.queue, (int)strlen(lcd16_context.queue.bData) + 1);
         // semaphore_unlock(&lcd16_context.sema_message);
@@ -54,17 +55,7 @@ void *rover_lcd16_control(void *args)
     } 
 
     else if(lcd16_context.states.update_time){
-      int index = get_pid(getpid());
-      if(index >= 0 &&  index < lcd16_context.mem->process_amount)
-      {
-        clock_gettime(CLOCK_MONOTONIC, &lcd16_context.current);
-        // if (semaphore_lock(&lcd16_context.sema_update) == 0)
-        {
-          lcd16_context.mem->processes[index].update = (time_t)((double)lcd16_context.current.tv_sec + (double)lcd16_context.current.tv_nsec / (double)1000000000);
-          // semaphore_unlock(&lcd16_context.sema_update);
-        }
-      }
-      lcd16_context.states.update_time = 0;
+      update_clock(getpid(), &lcd16_context);
       alarm(PROCESS_CICLE_SECONDS);
     }
     
@@ -108,7 +99,7 @@ static void init(void)
   signal_register(update_time, SIGALRM);
   signal_register(end_lcd16, SIGTERM);
 
-  logger(LOGGER_INFO, ROVER_LCD16, "LCD16 initialized");
+  logger(LOGGER_INFO, ROVER_LCD16, "Initialized");
 
   alarm(PROCESS_CICLE_SECONDS);
 }

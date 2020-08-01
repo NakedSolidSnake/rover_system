@@ -6,6 +6,7 @@
 #include <signal/signal.h>
 #include <rover_server.h>
 #include <context.h>
+#include <auxiliar.h>
 
 #define ROVER_SERVER "ROVER_SERVER"
 
@@ -48,17 +49,7 @@ void *rover_server(void *args)
   {
     Server_exec(&server);
     if(server_context.states.update_time){
-      int index = get_pid(getpid());
-      if(index >= 0 &&  index < server_context.mem->process_amount)
-      {
-        clock_gettime(CLOCK_MONOTONIC, &server_context.current);
-        // if (semaphore_lock(&server_context.sema_update) == 0)
-        {
-          server_context.mem->processes[index].update = (time_t)((double)server_context.current.tv_sec + (double)server_context.current.tv_nsec/(double)1000000000);
-          // semaphore_unlock(&server_context.sema_update);
-        }
-      }
-      server_context.states.update_time = 0;
+      update_clock(getpid(), &server_context);
       alarm(PROCESS_CICLE_SECONDS);
     }
   }

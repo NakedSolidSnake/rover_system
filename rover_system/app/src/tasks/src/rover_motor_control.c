@@ -5,6 +5,7 @@
 #include <motors.h>
 #include <rover_motor_control.h>
 #include <context.h>
+#include <auxiliar.h>
 
 #define ROVER_MOTOR   "ROVER_MOTOR"
 
@@ -56,17 +57,7 @@ void *rover_motor_control(void *args)
     }
 
     else if(motor_context.states.update_time){
-      int index = get_pid(getpid());
-      if(index >= 0 &&  index < motor_context.mem->process_amount)
-      {
-        clock_gettime(CLOCK_MONOTONIC, &motor_context.current);        
-        // if (semaphore_lock(&motor_context.sema_update) == 0)
-        {
-          motor_context.mem->processes[index].update = (time_t)((double)motor_context.current.tv_sec + (double)motor_context.current.tv_nsec/(double)1000000000);
-          // semaphore_unlock(&motor_context.sema_update);
-        }
-      }
-      motor_context.states.update_time = 0;
+      update_clock(getpid(), &motor_context);
       alarm(PROCESS_CICLE_SECONDS);
     }
 

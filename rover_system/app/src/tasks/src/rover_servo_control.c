@@ -5,6 +5,7 @@
 #include <servo.h>
 #include <rover_servo_control.h>
 #include <context.h>
+#include <auxiliar.h>
 
 #define ROVER_SERVO "ROVER_SERVO"
 
@@ -55,17 +56,7 @@ void *rover_servo_control(void *args)
     }
 
     else if(servo_context.states.update_time){
-      int index = get_pid(getpid());
-      if(index >= 0 &&  index < servo_context.mem->process_amount)
-      {
-        clock_gettime(CLOCK_MONOTONIC, &servo_context.current);        
-        // if (semaphore_lock(&servo_context.sema_update) == 0)
-        {
-          servo_context.mem->processes[index].update = (time_t)((double)servo_context.current.tv_sec + (double)servo_context.current.tv_nsec/(double)1000000000);
-          // semaphore_unlock(&servo_context.sema_update);
-        }
-      }
-      servo_context.states.update_time = 0;
+      update_clock(getpid(), &servo_context);
       alarm(PROCESS_CICLE_SECONDS);
     }
 
