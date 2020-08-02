@@ -23,6 +23,8 @@ typedef struct Context
     sema_t sema_update;
     States_st states;
     struct timespec current; 
+    const char *logType;
+    TYPE_e deviceId;
 }Context_st;
 
 #endif

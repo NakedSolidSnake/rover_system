@@ -11,6 +11,19 @@ target_include_directories(auxiliar
   ${CMAKE_CURRENT_LIST_DIR}/tasks/include
   )
 
+# control_interface
+add_library(control_interface "")
+target_link_libraries(control_interface PUBLIC app auxiliar)
+target_sources(control_interface
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/tasks/libs/control_interface.c
+  )
+target_include_directories(control_interface
+  PUBLIC 
+  ${CMAKE_CURRENT_LIST_DIR}/tasks/libs
+  ${CMAKE_CURRENT_LIST_DIR}/tasks/include
+  )
+
 
 #------------------------------------------------------------------------------------------------------
 #rover_client

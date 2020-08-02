@@ -28,7 +28,7 @@ install(TARGETS rover_manager DESTINATION bin)
 
 #rover_motor_control
 add_executable(rover_motor_control "")
-target_link_libraries(rover_motor_control PUBLIC ipc drivers app auxiliar)
+target_link_libraries(rover_motor_control PUBLIC drivers control_interface)
 target_sources(rover_motor_control
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/../tasks/src/rover_motor_control.c
@@ -42,7 +42,7 @@ install(TARGETS rover_motor_control DESTINATION bin)
 
 #rover_servo_control
 add_executable(rover_servo_control "")
-target_link_libraries(rover_servo_control PUBLIC ipc drivers app auxiliar)
+target_link_libraries(rover_servo_control PUBLIC drivers control_interface)
 target_sources(rover_servo_control
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/../tasks/src/rover_servo_control.c
@@ -56,7 +56,7 @@ install(TARGETS rover_servo_control DESTINATION bin)
 
 #rover_ultrasound_control
 add_executable(rover_ultrasound_control "")
-target_link_libraries(rover_ultrasound_control PUBLIC ipc drivers app auxiliar)
+target_link_libraries(rover_ultrasound_control PUBLIC drivers control_interface)
 target_sources(rover_ultrasound_control
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/../tasks/src/rover_ultrasound_control.c
@@ -70,7 +70,7 @@ install(TARGETS rover_ultrasound_control DESTINATION bin)
 
 #rover_lcd16_control
 add_executable(rover_lcd16_control "")
-target_link_libraries(rover_lcd16_control PUBLIC ipc drivers app auxiliar)
+target_link_libraries(rover_lcd16_control PUBLIC drivers control_interface)
 target_sources(rover_lcd16_control
   PUBLIC 
   ${CMAKE_CURRENT_LIST_DIR}/../tasks/src/rover_lcd16_control.c
